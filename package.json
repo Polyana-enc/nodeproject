@@ -1,0 +1,19 @@
+{
+  "name": "dating-app",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Polyana-enc/nodeproject.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Polyana-enc/nodeproject/issues"
+  },
+  "homepage": "https://github.com/Polyana-enc/nodeproject#readme",
+  "description": ""
+}
