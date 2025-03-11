@@ -1,0 +1,18 @@
+{
+    "users": [
+      {
+        "id": 1,
+        "username": "john_doe",
+        "password_hash": "hashed_password_123",
+        "created_at": "2025-03-10T12:00:00Z",
+        "updated_at": "2025-03-10T12:30:00Z"
+      },
+      {
+        "id": 2,
+        "username": "jane_smith",
+        "password_hash": "hashed_password_456",
+        "created_at": "2025-03-10T12:05:00Z",
+        "updated_at": "2025-03-10T12:35:00Z"
+      }
+    ]
+  }

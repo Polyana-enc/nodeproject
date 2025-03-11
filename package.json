@@ -1,0 +1,31 @@
+{
+  "name": "kpinder",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "test",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Polyana-enc/nodeproject.git"
+  },
+  "author": "polyana enc",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Polyana-enc/nodeproject/issues"
+  },
+  "homepage": "https://github.com/Polyana-enc/nodeproject#readme",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "fs": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
+    "winston": "^3.17.0"
+  }
+}
