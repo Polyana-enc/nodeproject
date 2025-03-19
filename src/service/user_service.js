@@ -1,24 +1,37 @@
-const { get_user_by_id, create_user } = require("../repository/user_repository");
+const {
+  get_user_by_id,
+  create_user,
+  get_user_by_email,
+} = require("../repository/user_repository");
 const { hashPassword, comparePasswords } = require("../utils/password");
-const {generateToken} = require("../utils/jwtUtil");
+const { generateToken } = require("../utils/jwtUtil");
+const logger = require("../utils/logger");
 
-function get_user(id) {
-
+class UserExistsError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "UserExistsError"; 
+    }
 }
 
+function get_user(id) {}
+
 async function register_user(email, password) {
-    const existingUser = await userRepository.findByEmail(email);
-    if (existingUser) {
-        throw new Error(`User ${emal} already exists`);
+  const existing = await get_user_by_email();
+
+    if (existing) {
+        throw new UserExistsError(`User with email ${email} already exists`);
     }
 
-    let hach = await hashPassword(password);
-    let user = await create_user(email, password);
-    let token = generateToken(user.id);
+  const created_date = Date.now();
+  const hash = await hashPassword(password);
+  const user = await create_user(email, hash, created_date); 
+  const token = generateToken(user.id);
 
-    return {user: new_user, token};
+  return { user: user, token };
 }
 
 module.exports = {
-    register_user
+  register_user,
+  UserExistsError
 };

@@ -1,11 +1,11 @@
 const logger = require("../utils/logger");
 const fs = require('fs').promises;
 
-const MOCK_PATH = "../mock/users.json"; 
+const MOCK_PATH = "../nodeproject/src/mock/users.json"; 
 
 function get_user_by_id(id) {
     try {
-        const data = fs.readFileSync(filePath, 'utf8');
+        const data = fs.readFileSync(MOCK_PATH, 'utf8');
         const users = JSON.parse(data);
         return objects.find(obj => obj.id === id) || null;
       } catch (err) {
@@ -14,11 +14,23 @@ function get_user_by_id(id) {
       }
 }
 
-async function create_user(email, password) {
+async function get_user_by_email(email) {
+    try {
+        const data = await fs.readFile(MOCK_PATH, 'utf8'); 
+        const users = JSON.parse(data); 
+        return users.find(user => user.email === email) || null;
+    } catch (err) {
+        logger.error(`Error while reading or parsing users file: ${err}`);
+        throw err; 
+    }
+}
+
+async function create_user(email, password, created_at) {
     try {
         let users = [];
+
         try {
-            const data = await fs.readFile(filePath, 'utf8');
+            const data = await fs.readFile(MOCK_PATH, 'utf8');
             users = JSON.parse(data);
         } catch (err) {
             logger.error(`Error while creating a user: ${err}`);
@@ -26,12 +38,12 @@ async function create_user(email, password) {
         }
 
         const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-        const user = { id: newId, email, password };
-
+        const user = { id: newId, email, password, created_at, updated_at: created_at };
+    
         users.push(user);
-        await fs.writeFile(filePath, JSON.stringify(users, null, 2), 'utf8');
+        await fs.writeFile(MOCK_PATH, JSON.stringify(users, null, 2), 'utf8');
 
-        logger.info("User created:", user);
+        logger.info("User created:", user.email);
         return user;
     } catch (err) {
         logger.error('Error while saving user:', err);
@@ -39,4 +51,4 @@ async function create_user(email, password) {
     }
 }
 
-module.exports = {get_user_by_id, create_user};
+module.exports = {get_user_by_id, create_user, get_user_by_email};
