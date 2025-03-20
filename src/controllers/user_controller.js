@@ -1,7 +1,21 @@
-const { register_user, UserExistsError} = require("../service/user_service");
+const { register_user, get_user, UserExistsError} = require("../service/user_service");
 const logger = require("../utils/logger");
 
 async function get_user_by_id(req, res, next) {
+  try {
+    const user_id = req.user_id;
+    const user = get_user(user_id);
+    
+    if (!user) return res.status(404).json({ message: "User not found" });
+    
+    res.status(200).json({user});
+  }
+  catch {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+async function user_login(req, res, next) { 
   res.status(501).json({ message: "Not implemented" });
 }
 
@@ -14,7 +28,7 @@ const user_register = async (req, res, _next) => {
   }
 
   try {
-    const { user, token } = await register_user(email, password);
+    const { user, token } = await register_user(email,password);
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -35,4 +49,4 @@ const user_register = async (req, res, _next) => {
 }
 };
 
-module.exports = { user_register, get_user_by_id };
+module.exports = { user_register, get_user_by_id, user_login };

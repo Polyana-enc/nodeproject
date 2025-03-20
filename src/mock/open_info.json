@@ -6,7 +6,8 @@
         "name": "John Doe",
         "age": 28,
         "gender": "male",
-        "city": "Kyiv"
+        "city": "Kyiv",
+        "bio": "HULUMULU"
       },
       {
         "id": 2,
@@ -14,7 +15,8 @@
         "name": "Jane Smith",
         "age": 25,
         "gender": "female",
-        "city": "Kyiv"
+        "city": "Kyiv",
+        "bio": "HULUMULU"
       }
     ]
   }
