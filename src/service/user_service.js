@@ -19,6 +19,8 @@ function get_user(id) {
   return get_user_by_id(id);
 }
 
+function get_user(id) {}
+
 async function register_user(email, password) {
   const existing = await get_user_by_email(email);
 

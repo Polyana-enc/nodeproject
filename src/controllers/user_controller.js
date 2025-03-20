@@ -30,6 +30,7 @@ const user_register = async (req, res, _next) => {
   try {
     const { user, token } = await register_user(email,password);
 
+
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 1 * 24 * 60 * 60 * 1000,
