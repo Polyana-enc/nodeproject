@@ -25,7 +25,7 @@ const user_register = async (req, res, _next) => {
         user: { id: user.id, username: user.username, email: user.email },
     });
 } catch (err) {
-    logger.error("User registration failed:", err.message);
+    logger.error("User registration failed:", err);
     
     if (err instanceof UserExistsError) {
         return res.status(409).json({ message: "User already exists" });

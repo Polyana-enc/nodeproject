@@ -17,15 +17,16 @@ class UserExistsError extends Error {
 function get_user(id) {}
 
 async function register_user(email, password) {
-  const existing = await get_user_by_email();
-
+  const existing = await get_user_by_email(email);
+    console.log(existing)
     if (existing) {
         throw new UserExistsError(`User with email ${email} already exists`);
     }
 
-  const created_date = Date.now();
+  const created_date = new Date();
+  const formatted_date = created_date.toISOString();
   const hash = await hashPassword(password);
-  const user = await create_user(email, hash, created_date); 
+  const user = await create_user(email, hash, formatted_date); 
   const token = generateToken(user.id);
 
   return { user: user, token };
