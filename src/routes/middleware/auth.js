@@ -1,8 +1,6 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const logger = require("../../utils/logger");
-const cookieParser = require("cookie-parser");
 
 const SECRET_KEY = process.env.SECRET_KEY || "default_secret_key"; 
 
@@ -22,7 +20,7 @@ module.exports = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
-        req.user = decoded;
+        req.user_id = decoded.id;
         next();
     } catch (err) {
         logger.error(`Invalid token: ${err}`);

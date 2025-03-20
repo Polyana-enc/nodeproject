@@ -2,6 +2,7 @@ const {
   get_user_by_id,
   create_user,
   get_user_by_email,
+  get_user_password_by_id
 } = require("../repository/user_repository");
 const { hashPassword, comparePasswords } = require("../utils/password");
 const { generateToken } = require("../utils/jwtUtil");
@@ -14,19 +15,23 @@ class UserExistsError extends Error {
     }
 }
 
+function get_user(id) {
+  return get_user_by_id(id);
+}
+
 function get_user(id) {}
 
 async function register_user(email, password) {
   const existing = await get_user_by_email(email);
-    console.log(existing)
-    if (existing) {
+
+  if (existing) {
         throw new UserExistsError(`User with email ${email} already exists`);
     }
 
   const created_date = new Date();
   const formatted_date = created_date.toISOString();
   const hash = await hashPassword(password);
-  const user = await create_user(email, hash, formatted_date); 
+  const user = await create_user(email, hash, name, formatted_date); 
   const token = generateToken(user.id);
 
   return { user: user, token };
@@ -34,5 +39,6 @@ async function register_user(email, password) {
 
 module.exports = {
   register_user,
+  get_user,
   UserExistsError
 };
