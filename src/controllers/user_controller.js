@@ -5,7 +5,6 @@ async function get_user_by_id(req, res, next) {
   try {
     const user_id = req.user_id;
     const user = get_user(user_id);
-    
     if (!user) return res.status(404).json({ message: "User not found" });
     
     res.status(200).json({user});
@@ -37,7 +36,7 @@ const user_register = async (req, res, _next) => {
     });
     return res.status(200).json({
         message: "User was created",
-        user: { id: user.id, username: user.username, email: user.email },
+        user: { id: user.id, email: user.email },
     });
 } catch (err) {
     logger.error("User registration failed:", err);

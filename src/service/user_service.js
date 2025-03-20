@@ -19,8 +19,6 @@ function get_user(id) {
   return get_user_by_id(id);
 }
 
-function get_user(id) {}
-
 async function register_user(email, password) {
   const existing = await get_user_by_email(email);
 
@@ -31,7 +29,7 @@ async function register_user(email, password) {
   const created_date = new Date();
   const formatted_date = created_date.toISOString();
   const hash = await hashPassword(password);
-  const user = await create_user(email, hash, name, formatted_date); 
+  const user = await create_user(email, hash, formatted_date); 
   const token = generateToken(user.id);
 
   return { user: user, token };

@@ -8,8 +8,8 @@ function get_user_by_id(id) {
   try {
     const data = fs_sync.readFileSync(MOCK_PATH, "utf8");
     const users = JSON.parse(data);
-
     const user = users.find((obj) => obj.id === id) || null;
+   
     if (!user) return null;
     const userDTO = new DtoUser(
       user.id,
@@ -51,7 +51,7 @@ async function get_user_by_email(email) {
   }
 }
 
-async function create_user(email, password, name, created_at) {
+async function create_user(email, password, created_at) {
   try {
     let users = [];
 
@@ -69,7 +69,6 @@ async function create_user(email, password, name, created_at) {
       id: newId,
       email,
       password,
-      name,
       created_at,
       updated_at: created_at,
     };
