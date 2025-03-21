@@ -1,16 +1,30 @@
 [
   {
-    "id": 1, 
-    "email": "johndoe@examlpe.com", 
-    "password": "hashed_password_123", 
+    "id": 1,
+    "email": "johndoe@examlpe.com",
+    "password": "hashed_password_123",
     "created_at": "2025-03-10T12:00:00Z",
     "updated_at": "2025-03-10T12:30:00Z"
-  }, 
+  },
   {
     "id": 2,
     "email": "janesmith@example.com",
     "password": "hashed_password_456",
     "created_at": "2025-03-10T12:05:00Z",
     "updated_at": "2025-03-10T12:35:00Z"
+  },
+  {
+    "id": 3,
+    "email": "hulumulu.com",
+    "password": "$2b$10$2YW62cglcEciEgfMFk3fD.fl/1FwoxuJp8K96W4hmMCqJ1pzek2dC",
+    "created_at": "2025-03-20T22:32:27.536Z",
+    "updated_at": "2025-03-20T22:32:27.536Z"
+  },
+  {
+    "id": 4,
+    "email": "hulumulu@gamil.com",
+    "password": "$2b$10$iP1pBvJZ/iCpaPvvpU2WAuu9HMXq0jc3AcWHnTxFABpTHqKZNWMui",
+    "created_at": "2025-03-20T22:36:48.132Z",
+    "updated_at": "2025-03-20T22:36:48.132Z"
   }
 ]
