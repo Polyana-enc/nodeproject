@@ -10,6 +10,7 @@ const PORT = 3000;
 // app.use(express.static(path.join(__dirname, "public")));
 
 const usersRouter = require("./src/routes/users");
+// const formsRouter = require("./src/routes/forms")
 const idexRouter = require("./src/routes/index")
 const cookieParser = require("cookie-parser");
 
@@ -22,6 +23,7 @@ app.use(cors({
 
 app.use("", usersRouter);
 app.use("", idexRouter);
+// app.use("", formsRouter);
 
 app.listen(PORT, () => {
     logger.info(`Сервер запущено на http://localhost:${PORT}`);
