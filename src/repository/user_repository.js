@@ -44,7 +44,8 @@ async function get_user_by_email(email) {
   try {
     const data = await fs.readFile(MOCK_PATH, "utf8");
     const users = JSON.parse(data);
-    const user = users.find((user) => user.email === email) || null;
+    const user = users.find((user) => user.email === email);
+    if(!user) return null
     const userDTO = new DtoUser(
       user.id,
       user.email,
@@ -66,7 +67,7 @@ async function create_user(email, password, created_at) {
     try {
       const data = await fs.readFile(MOCK_PATH, "utf8");
       users = JSON.parse(data);
-      array.forEach((el) => {
+      users.forEach((el) => {
         el = new DtoUser(
           el.id,
           el.email,

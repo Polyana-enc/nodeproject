@@ -13,7 +13,6 @@ class DtoForm {
   open_info() {
     return {
       id: this.id,
-      user_id: this.user_id,
       name: this.name,
       age: this.age,
       gender: this.gender,
@@ -24,7 +23,6 @@ class DtoForm {
   private_info() {
     return {
       id: this.id,
-      user_id: this.user_id,
       email: this.email,
       phone: this.phone,
     };

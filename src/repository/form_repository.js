@@ -28,9 +28,7 @@ async function serialize_all_forms() {
 
 async function create_form(data) {
   const newId = forms.length > 0 ? Math.max(...forms.map((u) => u.id)) + 1 : 1;
-  if (forms.find((el) => el.user_id === data.user_id)) {
-    throw new Error("Duplicate user form");
-  }
+  if (forms.find((el) => el.user_id === data.user_id)) return null
   const new_form = new DtoForm(
     newId,
     data.user_id,
@@ -44,6 +42,7 @@ async function create_form(data) {
   );
   forms.push(new_form);
   await serialize_all_forms();
+  return new_form;
 }
 /**
  * 
@@ -63,11 +62,11 @@ function get_form_by_id(id) {
 }
 
 async function delete_form_by_id(id) {
-    const form_index = forms.findIndex((el) => el.id === id)
+    const form_index = forms.findIndex((el) => el.id === Number(id))
     if (form_index === -1){
         throw new Error(`Trying to delete non-existent form, id:${id}`)
     }
-    forms.splice(id, 1)
+    forms.splice(id-1, 1)
     await serialize_all_forms();
 }
 

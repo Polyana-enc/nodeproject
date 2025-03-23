@@ -9,7 +9,7 @@ const PORT = 3000;
 // app.use(express.static(path.join(__dirname, "public")));
 
 const usersRouter = require("./src/routes/users");
-// const formsRouter = require("./src/routes/forms")
+const formsRouter = require("./src/routes/forms")
 const idexRouter = require("./src/routes/index")
 const cookieParser = require("cookie-parser");
 const { deserialize_all_forms } = require("./src/repository/form_repository");
@@ -26,7 +26,7 @@ app.use("", idexRouter);
 app.use("", formsRouter);
 
 function init() {
-    deserialize_all_forms
+    deserialize_all_forms();
     //deserialize_all_users 
 }
 init()
