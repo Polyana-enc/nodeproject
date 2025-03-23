@@ -13,12 +13,18 @@ const usersRouter = require("./src/routes/users");
 const idexRouter = require("./src/routes/index")
 const cookieParser = require("cookie-parser");
 
+const inviteController = require("./src/controllers/invite_controller");
+const privateInfoController = require("./src/controllers/private_info_controller");
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
 }));
+
+app.use("/api", inviteController);
+app.use("/api", privateInfoController);
 
 app.use("", usersRouter);
 app.use("", idexRouter);
