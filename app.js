@@ -13,6 +13,7 @@ const formsRouter = require("./src/routes/forms")
 const idexRouter = require("./src/routes/index")
 const cookieParser = require("cookie-parser");
 const { deserialize_all_forms } = require("./src/repository/form_repository");
+const { deserialize_all_users } = require("./src/repository/user_repository");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -27,7 +28,7 @@ app.use("", formsRouter);
 
 function init() {
     deserialize_all_forms();
-    //deserialize_all_users 
+    deserialize_all_users();
 }
 init()
 app.listen(PORT, () => {

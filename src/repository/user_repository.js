@@ -4,22 +4,32 @@ const fs_sync = require("fs");
 const DtoUser = require("../models/user_model.js");
 const MOCK_PATH = "../nodeproject/src/mock/users.json";
 
+let users = [];
+async function deserialize_all_users() {
+  const data = await fs.readFile(MOCK_PATH, "utf8");
+  const array = JSON.parse(data);
+  users = array.map((el) => {
+    return new DtoUser(
+      el.id,
+      el.email,
+      el.password,
+      el.created_at,
+      el.updated_at,
+    );
+  });
+}
+
+async function serialize_all_users() {
+  await fs.writeFile(MOCK_PATH, JSON.stringify(users, null, 2), "utf8");
+}
+
 function get_user_by_id(id) {
   try {
-    const data = fs_sync.readFileSync(MOCK_PATH, "utf8");
-    const users = JSON.parse(data);
-    const user = users.find((obj) => obj.id === id) || null;
+    const user = users.find((el) => el.id === id) || null;
 
     if (!user) return null;
-    const userDTO = new DtoUser(
-      user.id,
-      user.email,
-      user.password,
-      user.created_at,
-      user.updated_at
-    );
 
-    return userDTO.public_user();
+    return user.public_user();
   } catch (err) {
     logger.error(`Error while getting a user: ${err}`);
     throw err;
@@ -28,10 +38,7 @@ function get_user_by_id(id) {
 
 function get_user_password_by_id(id) {
   try {
-    const data = fs_sync.readFileSync(MOCK_PATH, "utf8");
-    const users = JSON.parse(data);
-
-    const user = users.find((obj) => obj.id === id) || null;
+    const user = users.find((el) => el.id === id) || null;
     if (!user) return null;
 
     return user.password;
@@ -42,18 +49,10 @@ function get_user_password_by_id(id) {
 }
 async function get_user_by_email(email) {
   try {
-    const data = await fs.readFile(MOCK_PATH, "utf8");
-    const users = JSON.parse(data);
     const user = users.find((user) => user.email === email);
-    if(!user) return null
-    const userDTO = new DtoUser(
-      user.id,
-      user.email,
-      user.password,
-      user.created_at,
-      user.updated_at
-    );
-    return userDTO.public_user();
+    if (!user) return null;
+    
+    return user.public_user();
   } catch (err) {
     logger.error(`Error while reading or parsing users file: ${err}`);
     throw err;
@@ -62,37 +61,13 @@ async function get_user_by_email(email) {
 
 async function create_user(email, password, created_at) {
   try {
-    let users = [];
-
-    try {
-      const data = await fs.readFile(MOCK_PATH, "utf8");
-      users = JSON.parse(data);
-      users.forEach((el) => {
-        el = new DtoUser(
-          el.id,
-          el.email,
-          el.password,
-          el.created_at,
-          el.updated_at
-        );
-      });
-    } catch (err) {
-      logger.error(`Error while creating a user: ${err}`);
-      throw err;
-    }
-
+    
     const newId =
       users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1;
-    const user = new DtoUser (
-      newId,
-      email,
-      password,
-      created_at,
-      created_at,
-    );
+    const user = new DtoUser(newId, email, password, created_at, created_at);
 
     users.push(user);
-    await fs.writeFile(MOCK_PATH, JSON.stringify(users, null, 2), "utf8");
+    await serialize_all_users();
 
     logger.info("User created:", user.email);
     return user;
@@ -103,6 +78,8 @@ async function create_user(email, password, created_at) {
 }
 
 module.exports = {
+  serialize_all_users,
+  deserialize_all_users,
   get_user_by_id,
   create_user,
   get_user_by_email,

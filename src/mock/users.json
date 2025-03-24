@@ -33,5 +33,12 @@
     "password": "$2b$10$KoD0VWjy8cVHzWuyi.H.qeWheNmV9vkHSNx4izNDjWst.kNArNUR2",
     "created_at": "2025-03-23T20:36:05.806Z",
     "updated_at": "2025-03-23T20:36:05.806Z"
+  },
+  {
+    "id": 6,
+    "email": "hulumulu1@gmail.com",
+    "password": "$2b$10$q5.3Xv4CLIoRZ2FEH/4nmu0EzIuhDY6W94DEazPD09kPff9KXyf.u",
+    "created_at": "2025-03-24T14:17:04.457Z",
+    "updated_at": "2025-03-24T14:17:04.457Z"
   }
 ]
