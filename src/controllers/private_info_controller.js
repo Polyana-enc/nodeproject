@@ -8,25 +8,32 @@ const path = require("path");
 const privateInfoPath = path.join(__dirname, "../mock/private_info.json");
 const invitesPath = path.join(__dirname, "../mock/invite.json");
 
-router.get("/private-info/:userId", authMiddleware, (req, res) => {
+router.get("/private-info/:userId", authMiddleware, async (req, res) => {
     const { userId } = req.params;
     const currentUserId = req.user_id;
 
-    const invites = JSON.parse(fs.readFileSync(invitesPath, "utf-8"));
-    const validInvite = invites.find(inv => inv.sender_id == userId && inv.receiver_id == currentUserId && inv.status === "accepted");
+    try {
+        const invites = await fs.promises.readFile(invitesPath, "utf-8");
+        const parsedInvites = JSON.parse(invites);
+        const validInvite = parsedInvites.find(inv => inv.sender_id === userId && inv.receiver_id === currentUserId && inv.status === "accepted");
 
-    if (!validInvite) {
-        return res.status(403).json({ message: "Access denied. No accepted invite found." });
-    }
+        if (!validInvite) {
+            return res.status(403).json({ message: "Access denied. No accepted invite found." });
+        }
 
-    const privateInfo = JSON.parse(fs.readFileSync(privateInfoPath, "utf-8"));
-    const userPrivateInfo = privateInfo.find(info => info.user_id == userId);
-    
-    if (!userPrivateInfo) {
-        return res.status(404).json({ message: "Private information not found." });
+        const privateInfo = await fs.promises.readFile(privateInfoPath, "utf-8");
+        const parsedPrivateInfo = JSON.parse(privateInfo);
+        const userPrivateInfo = parsedPrivateInfo.find(info => info.user_id === userId);
+
+        if (!userPrivateInfo) {
+            return res.status(404).json({ message: "Private information not found." });
+        }
+
+        res.status(200).json(userPrivateInfo);
+    } catch (error) {
+        logger.error("Error fetching private info", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-    
-    res.status(200).json(userPrivateInfo);
 });
 
 module.exports = router;
