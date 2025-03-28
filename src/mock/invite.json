@@ -1,19 +1,23 @@
-{
-    "invitations": [
-      {
-        "id": 1,
-        "from_user_id": 1,
-        "to_user_id": 2,
-        "status": "pending",
-        "created_at": "2025-03-10T13:00:00Z"
-      },
-      {
-        "id": 2,
-        "from_user_id": 2,
-        "to_user_id": 1,
-        "status": "accepted",
-        "created_at": "2025-03-10T13:10:00Z"
-      }
-    ]
+[
+  {
+    "id": 1,
+    "sender_id": 1,
+    "receiver_id": 2,
+    "status": "pending",
+    "created_at": "2025-03-10T13:00:00Z"
+  },
+  {
+    "id": 2,
+    "sender_id": 2,
+    "receiver_id": 1,
+    "status": "accepted",
+    "created_at": "2025-03-10T13:10:00Z"
+  },
+  {
+    "id": 4,
+    "sender_id": 6,
+    "receiver_id": "3",
+    "status": "pending",
+    "created_at": "2025-03-28T21:05:09.591Z"
   }
-  
+]
