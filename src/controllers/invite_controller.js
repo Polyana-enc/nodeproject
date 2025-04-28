@@ -17,15 +17,15 @@ async function createInvite(req, res) {
       logger.error("Invalid form data");
       return res.status(400).json({ message: "All fields are required" });
     }
-    if (!get_user_by_id(sender_id)) {
+    if (!(await get_user_by_id(sender_id))) {
       return res.status(400).json({ message: "Sender not found" });
     }
-    if (!get_user_by_id(Number(receiver_id))) {
+    if (!(await get_user_by_id(Number(receiver_id)))) {
       return res.status(400).json({ message: "Receiver not found" });
     }
     const created_date = new Date();
     const formatted_date = created_date.toISOString();
-    const invite = await create_invite({ sender_id: sender_id, receiver_id: receiver_id, created_at: formatted_date });
+    const invite = await create_invite({ sender_id, receiver_id, created_at: formatted_date });
     res.status(200).json({ invite: invite });
   } catch (err) {
     logger.error(err);
@@ -33,36 +33,34 @@ async function createInvite(req, res) {
   }
 }
 
-function getInviteById(req, res) {
+async function getInviteById(req, res) {
   try {
     const invite_id = Number(req.params.invite_id);
-    const invite = get_invite_by_id(invite_id);
+    const invite = await get_invite_by_id(invite_id);
     if (!invite) return res.status(404).json({ message: "Invite not found" });
-
     res.status(200).json({ invite: invite });
   } catch (err) {
     logger.error(err);
     return res.status(500).json({ message: "Internal server error" });
   }
 }
-function getAllInvitesBySenderId(req, res) {
+
+async function getAllInvitesBySenderId(req, res) {
   try {
     const sender_id = Number(req.params.sender_id);
-    const invite = get_all_invites_by_sender_id(sender_id);
-
-    res.status(200).json({ invites: invite });
+    const invites = await get_all_invites_by_sender_id(sender_id);
+    res.status(200).json({ invites: invites });
   } catch (err) {
     logger.error(err);
     return res.status(500).json({ message: err });
   }
 }
 
-function getAllInvitesByReceiverId(req, res) {
+async function getAllInvitesByReceiverId(req, res) {
   try {
     const receiver_id = Number(req.params.receiver_id);
-    const invite = get_all_invites_by_receiver_id(receiver_id);
-
-    res.status(200).json({ invites: invite });
+    const invites = await get_all_invites_by_receiver_id(receiver_id);
+    res.status(200).json({ invites: invites });
   } catch (err) {
     logger.error(err);
     return res.status(500).json({ message: err });
@@ -80,9 +78,9 @@ async function deleteInviteById(req, res) {
   }
 }
 
-function acceptInviteById(req, res) {
+async function acceptInviteById(req, res) {
   try {
-    set_invite_status_by_id(Number(req.params.invite_id), "accepted");
+    await set_invite_status_by_id(Number(req.params.invite_id), "accepted");
     res.status(200).json({ message: "Invite accepted successfully" });
   } catch (err) {
     logger.error(err);
@@ -90,9 +88,9 @@ function acceptInviteById(req, res) {
   }
 }
 
-function rejectInviteById(req, res) {
+async function rejectInviteById(req, res) {
   try {
-    set_invite_status_by_id(Number(req.params.invite_id), "rejected");
+    await set_invite_status_by_id(Number(req.params.invite_id), "rejected");
     res.status(200).json({ message: "Invite rejected successfully" });
   } catch (err) {
     logger.error(err);
