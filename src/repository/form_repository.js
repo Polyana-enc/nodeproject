@@ -54,6 +54,13 @@ async function create_form(data) {
   return new_form;
 }
 /**
+ * Returns all forms
+ * @returns {DtoForm[]}
+ */
+function get_all_forms() {
+  return forms;
+}
+/**
  * Returns form by user id and undefined otherwise
  * @param {number} user_id form user id
  * @returns {DtoForm} found form
@@ -91,36 +98,17 @@ async function delete_form_by_user_id(user_id) {
 }
 /**
  * Updates form (if it exists) information by id and otherwise returns null
- * @param {number} id form id
- * @param {object} data {name, age, gender, city, bio, email, phone}
+ * @param {object} data {id, name, age, gender, city, bio, email, phone}
  * @returns {DtoForm} updated form
  */
-function update_form_by_id(id, data){
-  const form = get_form_by_id(id);
+function update_form_by_id(data){
+  const form = get_form_by_id(data.id);
   if (!form) return null
   form.name = data.name
   form.age = data.age;
   form.gender = data.gender;
   form.city = data.city;
   form.bio = data.bio;
-  form.email = data.email;
-  form.phone = data.phone
-  serialize_all_forms()
-  return form
-}
-/**
- * Updates form (if it exists) information by user id and otherwise returns null
- * @param {number} user_id form user id
- * @param {object} data {name, age, gender, city, bio, email, phone}
- * @returns {DtoForm} updated form
- */
-function update_form_by_user_id(user_id, data){
-  const form = get_form_by_user_id(user_id);
-  if (!form) return null
-  form.age = data.age;
-  form.bio = data.bio;
-  form.city = data.city;
-  form.gender = data.gender;
   form.email = data.email;
   form.phone = data.phone
   serialize_all_forms()
@@ -136,5 +124,5 @@ module.exports = {
   delete_form_by_id,
   delete_form_by_user_id,
   update_form_by_id,
-  update_form_by_user_id
+  get_all_forms, 
 };

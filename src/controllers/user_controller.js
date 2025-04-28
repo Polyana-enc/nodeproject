@@ -1,6 +1,7 @@
 const {
   get_user_by_email,
   get_user_password_by_id,
+  delete_user_by_id,
 } = require("../repository/user_repository");
 const {
   register_user,
@@ -48,8 +49,8 @@ async function user_login(req, res, next) {
 
 function user_logout(req, res, next) {
   try {
-    res.clearCookie("token")
-    return res.status(200).json({message: "Logout successful"});
+    res.clearCookie("token");
+    return res.status(200).json({ message: "Logout successful" });
   } catch (err) {
     logger.error(err);
     return res.status(400).json({ message: "Logout error" });
@@ -86,4 +87,20 @@ const user_register = async (req, res, _next) => {
   }
 };
 
-module.exports = { user_register, get_user_by_id, user_login, user_logout };
+async function deleteUserById(req, res, next) {
+  try {
+    const user_id = req.user_id;
+    const user = await delete_user_by_id(user_id);
+    res.status(200).json({ user: user });
+  } catch (err) {
+    logger.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+module.exports = {
+  user_register,
+  get_user_by_id,
+  user_login,
+  user_logout,
+  deleteUserById,
+};

@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   getFormById,
   createForm,
+  updateFormById,
   deleteFormById,
   deleteFormByUserId,
   getFormByUserId,
@@ -28,5 +29,7 @@ router.get("/form/:form_id/:type", getInfoById);
 // Authorization: token.user_id.1
 router.delete("/form", authMiddleware, deleteFormByUserId);
 router.delete("/form/:form_id", deleteFormById);
+router.put("/form", updateFormById);
+
 
 module.exports = router;

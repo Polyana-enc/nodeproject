@@ -87,12 +87,21 @@ function update_user_by_id(id){
   return user
 }
 
+function delete_user_by_id(id){
+  const user = get_user_by_id(id);
+  if(!user) return null
+  users = users.filter(function(user){return user.id != id})
+  serialize_all_users()
+  return user
+}
+
 module.exports = {
   serialize_all_users,
   deserialize_all_users,
-  get_user_by_id,
   create_user,
+  get_user_by_id,
   get_user_by_email,
   get_user_password_by_id,
   update_user_by_id,
+  delete_user_by_id,
 };

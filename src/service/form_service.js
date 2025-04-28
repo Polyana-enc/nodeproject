@@ -10,7 +10,6 @@ async function getFormById(id, type) {
   
   const form = get_form_by_id(Number(id));
   if(!form) throw new Error(`Form not found by id: ${id}`)
-  console.log(form)
   if (type === "public") {
     return form.open_info();
   } else if (type === "private") {

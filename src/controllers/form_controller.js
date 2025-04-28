@@ -2,6 +2,7 @@ const logger = require("../utils/logger");
 const {
   create_form,
   get_form_by_user_id,
+  update_form_by_id,
   delete_form_by_id,
   delete_form_by_user_id,
   get_form_by_id,
@@ -52,9 +53,7 @@ async function getInfoById(req, res, next) {
     
     const { form_id, type } = req.params;
     const form = await service.getFormById(form_id, type);
-    console.log("first")
-    console.log(form)
-    if (!form) return res.status(404).json({ message: "Form not found" });
+        if (!form) return res.status(404).json({ message: "Form not found" });
 
     res.status(200).json({ form: form });
   } catch (err) {
@@ -91,6 +90,17 @@ async function getInfoByUserId(req, res, next) {
   }
 }
 
+async function updateFormById(req, res, next) {
+  try {
+    const form = req.body
+    const updatedForm = await update_form_by_id(form)
+    res.status(200).json({ form: updatedForm });
+  } catch (err) {
+    logger.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 async function deleteFormById(req, res, next) {
   try {
     await delete_form_by_id(req.params.form_id);
@@ -106,7 +116,7 @@ async function deleteFormByUserId(req, res, next) {
   try {
     await delete_form_by_user_id(req.user_id);
 
-    res.status(200).json({ message: `Form deleted, ${req.user_id}` });
+    res.status(200).json({ message: `Form deleted, id:${req.user_id}` });
   } catch (err) {
     logger.error(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -116,6 +126,7 @@ async function deleteFormByUserId(req, res, next) {
 module.exports = {
   getFormById,
   createForm,
+  updateFormById,
   deleteFormById,
   deleteFormByUserId,
   getFormByUserId,
