@@ -1,17 +1,130 @@
-<!-- This is register page, here user can register (🤓🤓🤓)
- don`t forget to add password confirmation and redirection button/link to login page
- (if user already have account they must have ability log in)
- after successful registration redirect to form editor page
- (all users must have their form, so let them create it right after registration)-->
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Page</title>
-    <link rel="stylesheet" href="/css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register – LoveConnect</title>
+  <link rel="stylesheet" href="/css/styles.css"/>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #fceabb, #f8b500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #e63946;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #1d3557;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: #e63946;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #d62839;
+    }
+
+    .switch {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .switch a {
+      color: #1d3557;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to the Register Page!</h1>
+  <div class="container">
+    <h1>Create an account</h1>
+    <form id="registerForm">
+      <label for="email">Email</label>
+      <input type="email" name="email" required />
+
+      <label for="password">Password</label>
+      <input type="password" name="password" required />
+
+      <label for="confirm">Confirm Password</label>
+      <input type="password" name="confirm" required />
+
+      <button type="submit">Register</button>
+    </form>
+
+    <div class="switch">
+      Already have an account? <a href="/login">Login here</a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = form.email.value;
+      const password = form.password.value;
+      const confirm = form.confirm.value;
+
+      if (password !== confirm) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      const res = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (res.ok) {
+        window.location.href = "/";
+      } else {
+        const data = await res.json();
+        alert(data.message || "Registration failed");
+      }
+    });
+  </script>
 </body>
 </html>

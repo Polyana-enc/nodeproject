@@ -1,15 +1,155 @@
-<!-- This is form edit page, here user edit their form (😲😲😲)
- user may have ability to edit their form (this function is not implemented for now, but form creation works properly) 
- use this page for form creation after registration, but include form edit usage -->
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form edit Page</title>
-    <link rel="stylesheet" href="/css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create/Edit Profile – LoveConnect</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #fbc2eb, #a6c1ee);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1d3557;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #333;
+      font-weight: 600;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: #457b9d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #1d3557;
+    }
+
+    .back-button {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .back-button a {
+      display: inline-block;
+      padding: 0.5rem 1.2rem;
+      background-color: #ccc;
+      color: #333;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+
+    .back-button a:hover {
+      background-color: #bbb;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to the Form edit Page!</h1>
+  <div class="container">
+    <h1><%= form ? "Edit Your Profile" : "Create Your Profile" %></h1>
+
+    <form id="profileForm">
+      <label>Name</label>
+      <input type="text" name="name" value="<%= form?.name || '' %>" required>
+
+      <label>Age</label>
+      <input type="number" name="age" value="<%= form?.age || '' %>" required>
+
+      <label>Gender</label>
+      <select name="gender" required>
+        <option value="">Select gender</option>
+        <option value="male" <%= form?.gender === 'male' ? 'selected' : '' %>>Male</option>
+        <option value="female" <%= form?.gender === 'female' ? 'selected' : '' %>>Female</option>
+      </select>
+
+      <label>City</label>
+      <input type="text" name="city" value="<%= form?.city || '' %>" required>
+
+      <label>Bio</label>
+      <textarea name="bio" rows="3" required><%= form?.bio || '' %></textarea>
+
+      <label>Email</label>
+      <input type="email" name="email" value="<%= form?.email || '' %>" required>
+
+      <label>Phone</label>
+      <input type="tel" name="phone" value="<%= form?.phone || '' %>" required>
+
+      <button type="submit"><%= form ? "Update Profile" : "Create Profile" %></button>
+    </form>
+
+  <div class="back-button">
+  <a href="/user" class="btn" style="background-color: #ccc; color: #333; text-decoration: none;">⬅ Back</a>
+</div>
+
+  </div>
+
+  <script>
+    const form = document.getElementById("profileForm");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const json = {};
+      formData.forEach((value, key) => (json[key] = value));
+
+      const res = await fetch("/api/form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(json),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Profile created!");
+        window.location.href = "/";
+      } else {
+        alert(data.message || "Error creating profile");
+      }
+    });
+  </script>
 </body>
 </html>
