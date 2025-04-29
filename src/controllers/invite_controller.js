@@ -12,7 +12,7 @@ const { get_user_by_id } = require("../repository/user_repository");
 async function createInvite(req, res) {
   try {
     const sender_id = req.user_id;
-    const receiver_id = req.params.receiver_id;
+    const receiver_id = Number(req.params.receiver_id);
     if (!sender_id || !receiver_id) {
       logger.error("Invalid form data");
       return res.status(400).json({ message: "All fields are required" });
