@@ -20,5 +20,16 @@
     "bio": "BABABOY",
     "email": "jane@example.com",
     "phone": "+380671234567"
+  },
+  {
+    "id": 3,
+    "user_id": 6,
+    "name": "HULUMULU",
+    "age": 52,
+    "gender": "HULUMULU",
+    "city": "HULUMULU",
+    "bio": "HULUMULU",
+    "email": "HULUMULU@example.com",
+    "phone": "+380671234567"
   }
 ]

@@ -66,6 +66,25 @@
         transition: background 0.3s;
       }
 
+      .button-row {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .button-row .btn {
+        flex: 1 1 0;
+        padding: 0.7rem;
+        background-color: #e63946;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: background 0.3s;
+      }
+
       .btn:hover {
         background-color: #d62839;
       }
@@ -89,7 +108,11 @@
 
       <div class="buttons">
         <a class="btn" href="/form/edit">✏️ Edit My Profile</a>
-        <a class="btn" href="/invites">💌 View My Invites</a>
+        <div class="button-row">
+          <a class="btn" href="/sendedInvites">💌 Sended Invites</a>
+          <a class="btn" href="/receivedInvites">📥 Received Invites</a>
+        </div>
+
         <a class="btn secondary" href="/">⬅ Back to Main Page</a>
         <form method="POST" action="/user/logout" class="btn2">
           <a href="/login" class="btn2" type="submit">🚪 Logout</a>
