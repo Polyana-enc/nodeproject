@@ -157,7 +157,8 @@
             <p><strong>City:</strong> <%= form.city %></p>
             <p><strong>Gender:</strong> <%= form.gender %></p>
             <p><em><%= form.bio %></em></p>
-            <% const inviteSent = invites.some(invite => invite.receiver_id === form.user_id); %>
+            <%const inviteSent = invites.some(invite => (invite.sender_id === userId) || (invite.receiver_id === userId)); %>
+
             <form class="invite-form" data-user-id="<%= form.user_id %>">
               <input type="hidden" name="to_user_id" value="<%= form.user_id %>" />
               <button class="btn" type="submit" <%= inviteSent ? "disabled" : "" %>>

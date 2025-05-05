@@ -101,7 +101,6 @@
     <h1><%= form ? "Edit Your Profile" : "Create Your Profile" %></h1>
 
     <form id="profileForm">
-        <input type="hidden" name="id" value="<%= form?.id %>">
       <label>Name</label>
       <input type="text" name="name" value="<%= form?.name || '' %>" required>
 
@@ -138,14 +137,15 @@
 
   <script>
     const form = document.getElementById("profileForm");
-    form.addEventListener("submit",  async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const formData = new FormData(form);
       const json = {};
       formData.forEach((value, key) => (json[key] = value));
 
-      const res = await fetch(`/api/form`, {
-        method: "PUT",
+      const res = await fetch("/api/form", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(json),
@@ -154,7 +154,7 @@
       const data = await res.json();
 
       if (res.ok) {
-        alert("Profile updated!");
+        alert("Profile created!");
         window.location.href = "/";
       } else {
         alert(data.message || "Error creating profile");

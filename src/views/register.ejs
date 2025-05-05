@@ -119,7 +119,7 @@
       });
 
       if (res.ok) {
-        window.location.href = "/";
+        window.location.href = "/form/create";
       } else {
         const data = await res.json();
         alert(data.message || "Registration failed");

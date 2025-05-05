@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const { get_all_forms } = require("../repository/form_repository");
+const {
+  get_all_forms,
+  get_form_by_user_id,
+} = require("../repository/form_repository");
 const {
   get_all_invites_by_sender_id,
   get_all_invites_by_receiver_id,
@@ -23,7 +26,8 @@ router.get("/", (req, res) => {
       return form.user_id != userId;
     });
     const invites = get_all_invites_by_sender_id(userId);
-    res.render("index", { forms, invites });
+    invites.push(get_all_invites_by_receiver_id(userId));
+    res.render("index", { forms, invites, userId });
   } catch (err) {
     console.log(err);
     return res.redirect("/register");
@@ -45,9 +49,26 @@ router.get("/register", (req, res) => {
   res.render("register");
 });
 
+// Form Create Page
+router.get("/form/create", (req, res) => {
+  res.render("form_create", { form: null });
+});
+
 // Form Edit Page
 router.get("/form/edit", (req, res) => {
-  res.render("form_edit", { form: null });
+  const token = req.cookies?.token;
+  if (!token) return res.redirect("/login");
+
+  try {
+    jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, SECRET_KEY);
+    const userId = decoded.id;
+    const form = get_form_by_user_id(userId);
+    res.render("form_edit", { form: form });
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/register");
+  }
 });
 
 router.get("/sendedInvites", (req, res) => {
