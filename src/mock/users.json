@@ -1,44 +1,23 @@
 [
   {
     "id": 1,
-    "email": "johndoe@examlpe.com",
-    "password": "hashed_password_123",
-    "created_at": "2025-03-10T12:00:00Z",
-    "updated_at": "2025-03-10T12:30:00Z"
+    "email": "johnDoe@example.com",
+    "password": "$2b$10$4pvv2GG6i9QjDdi8l4Y6k.PfOQq.KNruEPlcYwoYDjUdPEY9nclSm", 
+    "created_at": "2025-05-05T12:30:54.256Z",
+    "updated_at": "2025-05-05T12:30:54.256Z"
   },
   {
     "id": 2,
-    "email": "janesmith@example.com",
-    "password": "hashed_password_456",
-    "created_at": "2025-03-10T12:05:00Z",
-    "updated_at": "2025-03-10T12:35:00Z"
+    "email": "janeDoe@example.com",
+    "password": "$2b$10$apfzJUWK9VvLumlnSzhHGuJfs4PwJhduFSclPxZ4NkCUYuAjR9uwG",
+    "created_at": "2025-05-05T12:33:28.314Z",
+    "updated_at": "2025-05-05T12:33:28.314Z"
   },
   {
     "id": 3,
-    "email": "hulumulu.com",
-    "password": "$2b$10$2YW62cglcEciEgfMFk3fD.fl/1FwoxuJp8K96W4hmMCqJ1pzek2dC",
-    "created_at": "2025-03-20T22:32:27.536Z",
-    "updated_at": "2025-03-20T22:32:27.536Z"
-  },
-  {
-    "id": 4,
-    "email": "hulumulu@gamil.com",
-    "password": "$2b$10$iP1pBvJZ/iCpaPvvpU2WAuu9HMXq0jc3AcWHnTxFABpTHqKZNWMui",
-    "created_at": "2025-03-20T22:36:48.132Z",
-    "updated_at": "2025-03-20T22:36:48.132Z"
-  },
-  {
-    "id": 5,
-    "email": "hulumulu@gmail.com",
-    "password": "$2b$10$KoD0VWjy8cVHzWuyi.H.qeWheNmV9vkHSNx4izNDjWst.kNArNUR2",
-    "created_at": "2025-03-23T20:36:05.806Z",
-    "updated_at": "2025-03-23T20:36:05.806Z"
-  },
-  {
-    "id": 6,
-    "email": "hulumulu1@gmail.com",
-    "password": "$2b$10$q5.3Xv4CLIoRZ2FEH/4nmu0EzIuhDY6W94DEazPD09kPff9KXyf.u",
-    "created_at": "2025-03-24T14:17:04.457Z",
-    "updated_at": "2025-03-24T14:17:04.457Z"
+    "email": "kurenkov.maxim3000@icloud.com",
+    "password": "$2b$10$6AqROP8zMv4TgCn367qHLuzdVUjLXAfpoK83JMeJtlfe6QIDWo.96",
+    "created_at": "2025-05-05T12:23:59.154Z",
+    "updated_at": "2025-05-05T12:23:59.154Z"
   }
 ]

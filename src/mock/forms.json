@@ -23,13 +23,13 @@
   },
   {
     "id": 3,
-    "user_id": 6,
+    "user_id": 3,
     "name": "HULUMULU",
-    "age": 52,
-    "gender": "HULUMULU",
+    "age": "18",
+    "gender": "male",
     "city": "HULUMULU",
     "bio": "HULUMULU",
-    "email": "HULUMULU@example.com",
-    "phone": "+380671234567"
+    "email": "kurenkov.maxim3000@icloud.com",
+    "phone": "+38 097 000 2469"
   }
 ]

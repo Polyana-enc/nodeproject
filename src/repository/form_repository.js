@@ -31,7 +31,7 @@ async function serialize_all_forms() {
   await fs.writeFile(MOCK_FORMS, JSON.stringify(forms, null, 2), "utf8");
 }
 /**
- * Creates new form by data 
+ * Creates new form by data
  * @param {object} data {user_id, name, age, gender, city, bio, email, phone,}
  * @returns {DtoForm} created form
  */
@@ -74,7 +74,7 @@ function get_form_by_user_id(user_id) {
  * @returns {DtoForm} found form
  */
 function get_form_by_id(id) {
-  return forms.find((el) => el.id === id);
+  return forms.find((el) => el.id === Number(id));
 }
 /**
  * Deletes form (if it exists) by its id
@@ -101,18 +101,18 @@ async function delete_form_by_user_id(user_id) {
  * @param {object} data {id, name, age, gender, city, bio, email, phone}
  * @returns {DtoForm} updated form
  */
-function update_form_by_id(data){
+function update_form_by_id(data) {
   const form = get_form_by_id(data.id);
-  if (!form) return null
-  form.name = data.name
+  if (!form) return null;
+  form.name = data.name;
   form.age = data.age;
   form.gender = data.gender;
   form.city = data.city;
   form.bio = data.bio;
   form.email = data.email;
-  form.phone = data.phone
-  serialize_all_forms()
-  return form
+  form.phone = data.phone;
+  serialize_all_forms();
+  return form;
 }
 
 module.exports = {
@@ -124,5 +124,5 @@ module.exports = {
   delete_form_by_id,
   delete_form_by_user_id,
   update_form_by_id,
-  get_all_forms, 
+  get_all_forms,
 };
