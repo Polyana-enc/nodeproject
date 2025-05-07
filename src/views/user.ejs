@@ -114,10 +114,34 @@
         </div>
 
         <a class="btn secondary" href="/">⬅ Back to Main Page</a>
-        <form method="POST" action="/user/logout" class="btn2">
-          <a href="/login" class="btn2" type="submit">🚪 Logout</a>
-        </form>
+        <a href="#" id="logoutBtn" class="btn2">🚪 Logout</a>
       </div>
     </div>
   </body>
 </html>
+<script>
+  const logoutBtn = document.querySelector('#logoutBtn');
+
+logoutBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("/api/user/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      window.location.href = "/";
+    } else {
+      const data = await res.json();
+      alert(data.message || "Logout error");
+    }
+  } catch (err) {
+    console.error("Logout failed:", err);
+    alert("An unexpected error occurred");
+  }
+});
+
+</script>

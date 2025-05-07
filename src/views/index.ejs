@@ -133,9 +133,7 @@
     <header>
       <h1>Find some friends ❤️</h1>
       <div class="nav-buttons">
-  <form method="POST" action="/api/user/logout" >
-    <a href="/login" class="btn2" type="submit">Logout</a>
-  </form>
+        <a href="#" id="logoutBtn" class="btn2">🚪 Logout</a>
   <a class="btn secondary" href="/user">My Page</a>
 </div>
 
@@ -201,4 +199,28 @@
       }
     });
   });
+  const logoutBtn = document.querySelector('#logoutBtn');
+
+logoutBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("/api/user/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      window.location.href = "/";
+    } else {
+      const data = await res.json();
+      alert(data.message || "Logout error");
+    }
+  } catch (err) {
+    console.error("Logout failed:", err);
+    alert("An unexpected error occurred");
+  }
+});
+
 </script>

@@ -16,11 +16,11 @@ const SECRET_KEY = process.env.SECRET_KEY || "default_secret_key";
 router.get("/", (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/login");
-
+  const decoded = jwt.verify(token, SECRET_KEY);
+  const userId = decoded.id;
+  const form = get_form_by_user_id(userId);
+  if (!form) return res.redirect("/form/create");
   try {
-    jwt.verify(token, SECRET_KEY);
-    const decoded = jwt.verify(token, SECRET_KEY);
-    const userId = decoded.id;
     const rawForms = get_all_forms();
     const forms = rawForms.filter(function (form) {
       return form.user_id != userId;
@@ -36,6 +36,12 @@ router.get("/", (req, res) => {
 
 // My Page
 router.get("/user", (req, res) => {
+  const token = req.cookies?.token;
+  if (!token) return res.redirect("/login");
+  const decoded = jwt.verify(token, SECRET_KEY);
+  const userId = decoded.id;
+  const form = get_form_by_user_id(userId);
+  if (!form) return res.redirect("/form/create");
   res.render("user");
 });
 
@@ -51,6 +57,8 @@ router.get("/register", (req, res) => {
 
 // Form Create Page
 router.get("/form/create", (req, res) => {
+  const token = req.cookies?.token;
+  if (!token) return res.redirect("/login");
   res.render("form_create", { form: null });
 });
 
@@ -58,12 +66,11 @@ router.get("/form/create", (req, res) => {
 router.get("/form/edit", (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/login");
-
+  const decoded = jwt.verify(token, SECRET_KEY);
+  const userId = decoded.id;
+  const form = get_form_by_user_id(userId);
+  if (!form) return res.redirect("/form/create");
   try {
-    jwt.verify(token, SECRET_KEY);
-    const decoded = jwt.verify(token, SECRET_KEY);
-    const userId = decoded.id;
-    const form = get_form_by_user_id(userId);
     res.render("form_edit", { form: form });
   } catch (err) {
     console.log(err);
@@ -77,6 +84,8 @@ router.get("/sendedInvites", (req, res) => {
   const decoded = jwt.verify(token, SECRET_KEY);
   const userId = decoded.id;
   const invites = get_all_invites_by_sender_id(userId);
+  const form = get_form_by_user_id(userId);
+  if (!form) return res.redirect("/form/create");
   const forms = get_all_forms();
   const formattedForms = forms.filter((form) =>
     invites.some((invite) => form.user_id === invite.receiver_id),
@@ -99,6 +108,8 @@ router.get("/receivedInvites", (req, res) => {
   if (!token) return res.redirect("/login");
   const decoded = jwt.verify(token, SECRET_KEY);
   const userId = decoded.id;
+  const form = get_form_by_user_id(userId);
+  if (!form) return res.redirect("/form/create");
   const invites = get_all_invites_by_receiver_id(userId);
   const forms = get_all_forms();
   const formattedForms = forms.filter((form) =>
@@ -119,7 +130,10 @@ router.get("/receivedInvites", (req, res) => {
 router.get("/search", (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/register");
-
+  const decoded = jwt.verify(token, SECRET_KEY);
+  const userId = decoded.id;
+  const form = get_form_by_user_id(userId);
+  if (!form) return res.redirect("/form/create");
   try {
     jwt.verify(token, SECRET_KEY);
 
@@ -131,8 +145,9 @@ router.get("/search", (req, res) => {
         f.name.toLowerCase().includes(keyword) ||
         f.city.toLowerCase().includes(keyword),
     );
-
-    res.render("index", { forms: filtered });
+    const invites = get_all_invites_by_sender_id(userId);
+    invites.push(get_all_invites_by_receiver_id(userId));
+    res.render("index", { forms: filtered , invites: invites, userId: userId});
   } catch (err) {
     return res.redirect("/register");
   }
