@@ -13,59 +13,110 @@ async function createInvite(req, res) {
   try {
     const sender_id = req.user_id;
     const receiver_id = Number(req.params.receiver_id);
+
     if (!sender_id || !receiver_id) {
-      logger.error("Invalid form data");
-      return res.status(400).json({ message: "All fields are required" });
+      logger.warn("Missing sender or receiver ID");
+      return res.status(400).json({
+        success: false,
+        error: "Sender and receiver IDs are required",
+      });
     }
-    if (!get_user_by_id(sender_id)) {
-      return res.status(400).json({ message: "Sender not found" });
+
+    const sender = await get_user_by_id(sender_id);
+    const receiver = await get_user_by_id(receiver_id);
+
+    if (!sender) {
+      return res.status(404).json({
+        success: false,
+        error: "Sender not found",
+      });
     }
-    if (!get_user_by_id(Number(receiver_id))) {
-      return res.status(400).json({ message: "Receiver not found" });
+
+    if (!receiver) {
+      return res.status(404).json({
+        success: false,
+        error: "Receiver not found",
+      });
     }
-    const created_date = new Date();
-    const formatted_date = created_date.toISOString();
-    const invite = await create_invite({ sender_id: sender_id, receiver_id: receiver_id, created_at: formatted_date });
-    res.status(200).json({ invite: invite });
+
+    const created_date = new Date().toISOString();
+    const invite = await create_invite({ sender_id, receiver_id, created_at: created_date });
+
+    res.status(201).json({
+      success: true,
+      message: "Invite created successfully",
+      data: { invite },
+    });
   } catch (err) {
-    logger.error(err);
-    return res.status(400).json({ message: err });
+    logger.error("Create invite error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
 }
 
-function getInviteById(req, res) {
+async function getInviteById(req, res) {
   try {
     const invite_id = Number(req.params.invite_id);
-    const invite = get_invite_by_id(invite_id);
-    if (!invite) return res.status(404).json({ message: "Invite not found" });
+    const invite = await get_invite_by_id(invite_id);
 
-    res.status(200).json({ invite: invite });
+    if (!invite) {
+      return res.status(404).json({
+        success: false,
+        error: "Invite not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { invite },
+      message: "Invite retrieved successfully",
+    });
   } catch (err) {
-    logger.error(err);
-    return res.status(500).json({ message: "Internal server error" });
+    logger.error("Get invite error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
 }
-function getAllInvitesBySenderId(req, res) {
+
+async function getAllInvitesBySenderId(req, res) {
   try {
     const sender_id = Number(req.params.sender_id);
-    const invite = get_all_invites_by_sender_id(sender_id);
+    const invites = await get_all_invites_by_sender_id(sender_id);
 
-    res.status(200).json({ invites: invite });
+    res.status(200).json({
+      success: true,
+      data: { invites },
+      message: "Invites retrieved successfully",
+    });
   } catch (err) {
-    logger.error(err);
-    return res.status(500).json({ message: err });
+    logger.error("Get invites by sender error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
 }
 
-function getAllInvitesByReceiverId(req, res) {
+async function getAllInvitesByReceiverId(req, res) {
   try {
     const receiver_id = Number(req.params.receiver_id);
-    const invite = get_all_invites_by_receiver_id(receiver_id);
+    const invites = await get_all_invites_by_receiver_id(receiver_id);
 
-    res.status(200).json({ invites: invite });
+    res.status(200).json({
+      success: true,
+      data: { invites },
+      message: "Invites retrieved successfully",
+    });
   } catch (err) {
-    logger.error(err);
-    return res.status(500).json({ message: err });
+    logger.error("Get invites by receiver error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
 }
 
@@ -73,30 +124,49 @@ async function deleteInviteById(req, res) {
   try {
     const invite_id = Number(req.params.invite_id);
     await delete_invite_by_id(invite_id);
-    res.status(200).json({ message: "Invite deleted successfully" });
+
+    res.status(200).json({
+      success: true,
+      message: "Invite deleted successfully",
+    });
   } catch (err) {
-    logger.error(err);
-    return res.status(500).json({ message: err });
+    logger.error("Delete invite error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
 }
 
-function acceptInviteById(req, res) {
+async function acceptInviteById(req, res) {
   try {
-    set_invite_status_by_id(Number(req.params.invite_id), "accepted");
-    res.status(200).json({ message: "Invite accepted successfully" });
+    await set_invite_status_by_id(Number(req.params.invite_id), "accepted");
+    res.status(200).json({
+      success: true,
+      message: "Invite accepted successfully",
+    });
   } catch (err) {
-    logger.error(err);
-    return res.status(400).json({ message: err });
+    logger.error("Accept invite error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
 }
 
-function rejectInviteById(req, res) {
+async function rejectInviteById(req, res) {
   try {
-    set_invite_status_by_id(Number(req.params.invite_id), "rejected");
-    res.status(200).json({ message: "Invite rejected successfully" });
+    await set_invite_status_by_id(Number(req.params.invite_id), "rejected");
+    res.status(200).json({
+      success: true,
+      message: "Invite rejected successfully",
+    });
   } catch (err) {
-    logger.error(err);
-    return res.status(400).json({ message: err });
+    logger.error("Reject invite error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
 }
 
