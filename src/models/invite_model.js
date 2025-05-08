@@ -1,8 +1,9 @@
 class DtoInvite {
-  constructor(id, from_user_id, to_user_id, status, created_at) {
+  constructor(id, sender_id, receiver_id, status, created_at) {
     this.id = id;
-    this.from_user_id = from_user_id;
-    this.to_user_id = to_user_id;
+    this.sender_id = sender_id;
+    this.receiver_id = receiver_id;
+    this.status = status
     this.created_at = created_at;
   }
 }

@@ -1,25 +1,226 @@
-<!-- This is index page, the first page user see
- (think about it as a home page) -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/css/styles.css" />
-    <!-- All elements located in public folder: src\public -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LoveConnect – Home</title>
+  <link rel="stylesheet" href="/css/styles.css"/>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #fceabb, #f8b500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
 
-    <!-- NO NEED TO LOCATE '/public...' DIRECTORY, 
-     ex.: "/css/styles.css"✅✅✅, NOT: "/public/css/styles.css"❌❌❌-->
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-width: 1100px;
+      width: 100%;
+    }
 
-    <!-- To add new pages see src\routes\pages.js examples, 
-     don`t forget to test (see instructions in src\routes\pages.js) what you`ve done (don`t trust AI 100%, make your own decisions) -->
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-    <!-- Also try to use components instead of custom styles for each page, this may help in code editing -->
-    <title>Document</title>
-  </head>
-  <body>
-    <h1>HELLO EJS!!!</h1>
-    <img src="/images/photo_2025-03-24_01-26-31.jpg" alt="WOW">
-    <script type="text/javascript" src="/js/script.js"></script>
-  </body>
+    h1 {
+      font-size: 1.8rem;
+      color: #e63946;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      background-color: #e63946;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      text-decoration: none;
+    }
+
+    .btn2 {
+      padding: 0.5rem 1rem;
+      display: flex;
+      background-color: #e63946;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      text-decoration: none;
+      }
+
+    .btn:hover {
+      background-color: #d62839;
+    }
+
+    .btn2:hover:hover {
+      background-color: #d62839;
+    }
+
+    .btn.secondary {
+      background-color: #6c757d;
+    }
+
+    .btn.secondary:hover {
+      background-color: #495057;
+    }
+
+    .search-section {
+      display: flex;
+      gap: 1rem;
+      margin: 2rem 0 1.5rem 0;
+    }
+
+    .search-section input {
+      flex: 1;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .profiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .profile-card {
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .profile-card h3 {
+      margin: 0;
+      color: #1d3557;
+    }
+
+    .profile-card p {
+      margin: 0.3rem 0;
+      color: #555;
+    }
+
+    form {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Find some friends ❤️</h1>
+      <div class="nav-buttons">
+        <a href="#" id="logoutBtn" class="btn2">🚪 Logout</a>
+  <a class="btn secondary" href="/user">My Page</a>
+</div>
+
+    </header>
+
+    <div class="search-section">
+      <form method="GET" action="/search" style="display: flex; width: 100%;">
+        <input type="text" name="keyword" placeholder="Search profiles..." required />
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </div>
+    <div class="profiles">
+      <% if (forms.length === 0) { %>
+          <p>No profiles found.</p>
+        <% } %>
+        <% forms.forEach(form => { %>
+          <div class="profile-card">
+            <h3><%= form.name %>, <%= form.age %></h3>
+            <p><strong>City:</strong> <%= form.city %></p>
+            <p><strong>Gender:</strong> <%= form.gender %></p>
+            <p><em><%= form.bio %></em></p>
+            <%const inviteSent = invites.some(invite => (invite.sender_id === userId) || (invite.receiver_id === userId)); %>
+
+            <form class="invite-form" data-user-id="<%= form.user_id %>">
+              <input type="hidden" name="to_user_id" value="<%= form.user_id %>" />
+              <button class="btn" type="submit" <%= inviteSent ? "disabled" : "" %>>
+                <%= inviteSent ? "✅ Invite Sent" : "📨 Send Invite" %>
+              </button>
+          </form>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</body>
 </html>
+<script>
+  document.querySelectorAll(".invite-form").forEach(form => {
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault(); // prevent redirect
+
+      const toUserId = form.dataset.userId;
+      const button = form.querySelector("button");
+
+      try {
+        const res = await fetch(`/api/invite/${toUserId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ to_user_id: toUserId })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          button.textContent = "✅ Invite Sent";
+          button.disabled = true;
+        } else {
+          alert("Error: " + data.message);
+        }
+      } catch (err) {
+        console.error("Request failed:", err);
+        alert("Something went wrong.");
+      }
+    });
+  });
+  const logoutBtn = document.querySelector('#logoutBtn');
+
+logoutBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("/api/user/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      window.location.href = "/";
+    } else {
+      const data = await res.json();
+      alert(data.message || "Logout error");
+    }
+  } catch (err) {
+    console.error("Logout failed:", err);
+    alert("An unexpected error occurred");
+  }
+});
+
+</script>

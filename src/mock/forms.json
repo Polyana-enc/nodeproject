@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+    "user_id": 1,
     "name": "John Doe",
     "age": 28,
     "gender": "male",
@@ -11,6 +12,7 @@
   },
   {
     "id": 2,
+    "user_id": 2,
     "name": "Jane Smith",
     "age": 25,
     "gender": "female",
@@ -18,5 +20,16 @@
     "bio": "BABABOY",
     "email": "jane@example.com",
     "phone": "+380671234567"
+  },
+  {
+    "id": 3,
+    "user_id": 3,
+    "name": "HULUMULU",
+    "age": "18",
+    "gender": "male",
+    "city": "HULUMULU",
+    "bio": "HULUMULU",
+    "email": "kurenkov.maxim3000@icloud.com",
+    "phone": "+38 097 000 2469"
   }
 ]

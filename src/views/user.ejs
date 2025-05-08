@@ -1,18 +1,147 @@
-<!-- This is user page, here user can see their user info
- user may have ability to edit their user info and form (but these functions are not implemented for now ) 
- and logout-->
-
-<!-- WE DO NOT HAVE PHOTOS, NEITHER IN THE USER MODEL NOR IN THE FORM MODEL, DON`T ADD THEM🙅‍♂️🙅‍♂️🙅‍♂️ -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Page</title>
+    <title>My Page – LoveConnect</title>
     <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(120deg, #fceabb, #f8b500);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      .container {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2rem;
+        color: #e63946;
+        margin-bottom: 1.5rem;
+      }
+
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .btn {
+        padding: 0.7rem;
+        background-color: #e63946;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+      }
+
+      .btn2 {
+        margin: auto;
+        width: 20%;
+        padding: 0.7rem;
+        background-color: #e63946;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .button-row .btn {
+        flex: 1 1 0;
+        padding: 0.7rem;
+        background-color: #e63946;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: background 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #d62839;
+      }
+
+      .btn.secondary {
+        background-color: #6c757d;
+      }
+
+      .btn.secondary:hover {
+        background-color: #495057;
+      }
+
+      form {
+        margin: 0;
+      }
+    </style>
   </head>
   <body>
-    <h1>Welcome to the User Page!</h1>
-      <img src="/images/image.png" alt="WOW" style="width: 30%; height: 30%;"/>
+    <div class="container">
+      <h1>My Page</h1>
+
+      <div class="buttons">
+        <a class="btn" href="/form/edit">✏️ Edit My Profile</a>
+        <div class="button-row">
+          <a class="btn" href="/sendedInvites">💌 Sended Invites</a>
+          <a class="btn" href="/receivedInvites">📥 Received Invites</a>
+        </div>
+
+        <a class="btn secondary" href="/">⬅ Back to Main Page</a>
+        <a href="#" id="logoutBtn" class="btn2">🚪 Logout</a>
+      </div>
+    </div>
   </body>
 </html>
+<script>
+  const logoutBtn = document.querySelector('#logoutBtn');
+
+logoutBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("/api/user/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      window.location.href = "/";
+    } else {
+      const data = await res.json();
+      alert(data.message || "Logout error");
+    }
+  } catch (err) {
+    console.error("Logout failed:", err);
+    alert("An unexpected error occurred");
+  }
+});
+
+</script>
