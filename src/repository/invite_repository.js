@@ -94,7 +94,7 @@ function get_all_invites_by_receiver_id(receiver_id) {
  */
 async function delete_invite_by_id(invite_id) {
   const invite = get_invite_by_id(invite_id);
-  if (invite === undefined) {
+  if (!invite) {
     throw new Error(
       `Trying to delete non-existent invite, invite_id:${invite_id}`,
     );
@@ -108,7 +108,7 @@ async function delete_invite_by_id(invite_id) {
  */
 async function delete_invite_by_sender_id(sender_id) {
   const invite = get_invite_by_sender_id(sender_id);
-  if (invite === undefined) {
+  if (!invite) {
     throw new Error(
       `Trying to delete non-existent invite, sender_id:${sender_id}`,
     );
@@ -123,7 +123,7 @@ async function delete_invite_by_sender_id(sender_id) {
  */
 function set_invite_status_by_id(id, status) {
   const invite = get_invite_by_id(id);
-  if (invite === undefined) {
+  if (!invite) {
     throw new Error(`Trying to set status to non-existent invite, id:${id}`);
   }
   invite.status = status;
@@ -136,7 +136,7 @@ function set_invite_status_by_id(id, status) {
  */
 function set_invite_status_by_sender_id(sender_id, status) {
   const invite = get_invite_by_sender_id(sender_id);
-  if (invite === undefined) {
+  if (!invite) {
     throw new Error(
       `Trying to set status to non-existent invite, sender_id:${sender_id}`,
     );
@@ -150,7 +150,7 @@ function set_invite_status_by_sender_id(sender_id, status) {
  */
 function set_invite_status_by_receiver_id(receiver_id, status) {
   const invite = get_invite_by_receiver_id(receiver_id);
-  if (invite === undefined) {
+  if (!invite) {
     throw new Error(
       `Trying to set status to non-existent invite, receiver_id:${receiver_id}`,
     );

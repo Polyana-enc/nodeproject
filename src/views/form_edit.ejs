@@ -6,32 +6,6 @@
   <title>Create/Edit Profile – LoveConnect</title>
   <link rel="stylesheet" href="/css/styles.css">
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(120deg, #fbc2eb, #a6c1ee);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      background: white;
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      max-width: 600px;
-      width: 100%;
-    }
-
-    h1 {
-      text-align: center;
-      color: #1d3557;
-      margin-bottom: 1.5rem;
-    }
-
     label {
       display: block;
       margin-bottom: 0.3rem;
@@ -41,7 +15,7 @@
 
     input, textarea {
       width: 100%;
-      padding: 0.6rem;
+      padding: 0.4rem;
       margin-bottom: 1rem;
       border: 1px solid #ccc;
       border-radius: 8px;
@@ -50,6 +24,7 @@
     }
 
     select {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       width: 103.5%;
       padding: 0.6rem;
       margin-bottom: 1rem;
@@ -61,43 +36,11 @@
 
     button {
       width: 100%;
-      padding: 0.7rem;
-      background-color: #457b9d;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background-color: #1d3557;
-    }
-
-    .back-button {
-      margin-top: 1.5rem;
-      text-align: center;
-    }
-
-    .back-button a {
-      display: inline-block;
-      padding: 0.5rem 1.2rem;
-      background-color: #ccc;
-      color: #333;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: background 0.3s;
-    }
-
-    .back-button a:hover {
-      background-color: #bbb;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container_small">
     <h1><%= form ? "Edit Your Profile" : "Create Your Profile" %></h1>
 
     <form id="profileForm">
@@ -130,9 +73,11 @@
       <button type="submit"><%= form ? "Update Profile" : "Create Profile" %></button>
     </form>
 
-  <div class="back-button">
-  <a href="/user" class="btn" style="background-color: #ccc; color: #333; text-decoration: none;">⬅ Back</a>
-</div>
+  
+
+      
+    <div style="margin: auto; width: 25%; margin-top: 1rem;"><a href="/user" ><button class="secondary" >Back</button></a></div>
+  </div>
 
   </div>
 
