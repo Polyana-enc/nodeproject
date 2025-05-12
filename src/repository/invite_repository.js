@@ -1,14 +1,53 @@
-//KURMAX CODE ඞ
-const fs = require("fs").promises;
+// KURMAX CODE ඞ
+const fs = require("fs");
+const path = require("path");
 const DtoInvite = require("../models/invite_model.js");
-const MOCK_INVITES = "../nodeproject/src/mock/invite.json";
+
+const MOCK_INVITES = path.join(__dirname, "../mock/invite.json");
 
 let invites = [];
+
 /**
- * Deserializes all invites in JSON
+ * Deserializes all invites in JSON using one of the I/O modes
  */
 async function deserialize_all_invites() {
-  const data = await fs.readFile(MOCK_INVITES, "utf8");
+  const MODE = process.env.INVITE_REPO_MODE || "async";
+
+  if (MODE === "sync") {
+    const data = fs.readFileSync(MOCK_INVITES, "utf8");
+    parse_and_fill(data);
+    return;
+  }
+
+  if (MODE === "callback") {
+    return new Promise((resolve, reject) => {
+      fs.readFile(MOCK_INVITES, "utf8", (err, data) => {
+        if (err) return reject(err);
+        try {
+          parse_and_fill(data);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  }
+
+  if (MODE === "promise") {
+    return fs.promises.readFile(MOCK_INVITES, "utf8")
+      .then(data => parse_and_fill(data));
+  }
+
+  // async/await (default)
+  const data = await fs.promises.readFile(MOCK_INVITES, "utf8");
+  parse_and_fill(data);
+}
+
+/**
+ * Parses JSON data and fills invites array
+ * @param {string} data 
+ */
+function parse_and_fill(data) {
   const array = JSON.parse(data);
   invites = array.map((el) => {
     return new DtoInvite(
@@ -20,12 +59,14 @@ async function deserialize_all_invites() {
     );
   });
 }
+
 /**
  * Serializes all invites in JSON
  */
 async function serialize_all_invites() {
-  await fs.writeFile(MOCK_INVITES, JSON.stringify(invites, null, 2), "utf8");
+  await fs.promises.writeFile(MOCK_INVITES, JSON.stringify(invites, null, 2), "utf8");
 }
+
 /**
  * Creates invite by data
  * @param {object} data {sender_id, receiver_id, created_at}
@@ -48,49 +89,55 @@ async function create_invite(data) {
   await serialize_all_invites();
   return new_invite;
 }
+
 /**
- * Returns id and undefined otherwise
+ * Returns invite by id
  * @param {number} id invite id
  * @returns {DtoInvite} found invite
  */
 function get_invite_by_id(id) {
   return invites.find((el) => el.id === id);
 }
+
 /**
- * Returns invite by sender id and undefined otherwise
- * @param {number} sender_id invite sender id
- * @returns {DtoInvite} found invite
+ * Returns invite by sender id
+ * @param {number} sender_id
+ * @returns {DtoInvite}
  */
 function get_invite_by_sender_id(sender_id) {
   return invites.find((el) => el.sender_id === sender_id);
 }
+
 /**
- * Returns invite by receiver id and undefined otherwise
- * @param {number} receiver_id invite receiver id
- * @returns {DtoInvite} found invite
+ * Returns invite by receiver id
+ * @param {number} receiver_id
+ * @returns {DtoInvite}
  */
 function get_invite_by_receiver_id(receiver_id) {
   return invites.find((el) => el.receiver_id === receiver_id);
 }
+
 /**
  * Returns all invites by sender id
- * @param {number} sender_id invite sender id
- * @returns {DtoInvite[]} found invites array
+ * @param {number} sender_id
+ * @returns {DtoInvite[]}
  */
 function get_all_invites_by_sender_id(sender_id) {
   return invites.filter((el) => el.sender_id === sender_id);
 }
+
 /**
  * Returns all invites by receiver id
- * @param {number} receiver_id invite receiver id
- * @returns {DtoInvite[]} found invites array
+ * @param {number} receiver_id
+ * @returns {DtoInvite[]}
  */
 function get_all_invites_by_receiver_id(receiver_id) {
   return invites.filter((el) => el.receiver_id === receiver_id);
 }
+
 /**
  * Deletes invite (if it exists) by id
- * @param {number} invite_id invite id
+ * @param {number} invite_id
  */
 async function delete_invite_by_id(invite_id) {
   const invite = get_invite_by_id(invite_id);
@@ -99,12 +146,13 @@ async function delete_invite_by_id(invite_id) {
       `Trying to delete non-existent invite, invite_id:${invite_id}`,
     );
   }
-  invites.splice(invite.id - 1, 1);
+  invites.splice(invites.indexOf(invite), 1);
   await serialize_all_invites();
 }
+
 /**
  * Deletes invite (if it exists) by sender_id
- * @param {number} sender_id invite sender id
+ * @param {number} sender_id
  */
 async function delete_invite_by_sender_id(sender_id) {
   const invite = get_invite_by_sender_id(sender_id);
@@ -113,13 +161,14 @@ async function delete_invite_by_sender_id(sender_id) {
       `Trying to delete non-existent invite, sender_id:${sender_id}`,
     );
   }
-  invites.splice(invite.id - 1, 1);
+  invites.splice(invites.indexOf(invite), 1);
   await serialize_all_invites();
 }
+
 /**
  * Sets invite status by id
- * @param {number} id invite id
- * @param {'accepted' | 'rejected'} status invite status
+ * @param {number} id
+ * @param {'accepted' | 'rejected'} status
  */
 function set_invite_status_by_id(id, status) {
   const invite = get_invite_by_id(id);
@@ -129,6 +178,7 @@ function set_invite_status_by_id(id, status) {
   invite.status = status;
   serialize_all_invites();
 }
+
 /**
  * Sets invite status by sender id
  * @param {number} sender_id
@@ -143,7 +193,9 @@ function set_invite_status_by_sender_id(sender_id, status) {
   }
   invite.status = status;
   serialize_all_invites();
-} /**
+}
+
+/**
  * Sets invite status by receiver id
  * @param {number} receiver_id
  * @param {'accepted' | 'rejected'} status
