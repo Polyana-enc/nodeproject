@@ -1,7 +1,5 @@
 //KURMAX CODE ඞ
-const fs = require("fs").promises;
 const DtoInvite = require("../models/invite_model.js");
-const MOCK_INVITES = "../nodeproject/src/mock/invite.json";
 const pool = require("../../db").default;
 
 /**
@@ -86,9 +84,10 @@ async function set_invite_status_by_id(id, status) {
  * @returns {DtoInvite}
  */
 async function delete_invite_by_id(invite_id) {
-  const res = await pool.query("DELETE FROM invites WHERE id = $1 RETURNING *", [
-    id,
-  ]);
+  const res = await pool.query(
+    "DELETE FROM invites WHERE id = $1 RETURNING *",
+    [id],
+  );
   if (res.rows.length === 0) {
     throw new Error(`Invite with id=${id} does not exist`);
   }
