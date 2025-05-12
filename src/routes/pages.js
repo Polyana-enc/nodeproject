@@ -25,8 +25,8 @@ router.get("/", (req, res) => {
     const forms = rawForms.filter(function (form) {
       return form.user_id != userId;
     });
-    const invites = get_all_invites_by_sender_id(userId);
-    invites.push(get_all_invites_by_receiver_id(userId));
+    const invites = await get_all_invites_by_sender_id(userId);
+    invites.push(...(await get_all_invites_by_receiver_id(userId)));
     res.render("index", { forms, invites, userId });
   } catch (err) {
     console.log(err);
@@ -145,8 +145,8 @@ router.get("/search", (req, res) => {
         f.name.toLowerCase().includes(keyword) ||
         f.city.toLowerCase().includes(keyword),
     );
-    const invites = get_all_invites_by_sender_id(userId);
-    invites.push(get_all_invites_by_receiver_id(userId));
+    const invites = await get_all_invites_by_sender_id(userId);
+    invites.push(...(await get_all_invites_by_receiver_id(userId)));
     res.render("index", { forms: filtered , invites: invites, userId: userId});
   } catch (err) {
     return res.redirect("/register");

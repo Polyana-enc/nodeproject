@@ -55,11 +55,11 @@
       <h1>Find some friends ❤️</h1>
       <div class="nav-buttons">
         <a href="#" id="logoutBtn" ><button>Logout</button></a>
-  <a href="/user"><button class="secondary">My Page</button></a>
-</div>
-
+        <a href="/user"><button class="secondary">My Page</button></a>
+      </div>
+      
     </header>
-
+    
     <div class="search-section">
       <form method="GET" action="/search" style="display: flex; width: 100%;">
         <input type="text" name="keyword" placeholder="Search profiles..." required />
@@ -68,7 +68,7 @@
     </div>
     <div class="profiles">
       <% if (forms.length === 0) { %>
-          <p>No profiles found.</p>
+        <p>No profiles found.</p>
         <% } %>
         <% forms.forEach(form => { %>
           <div class="profile-card">
@@ -76,7 +76,7 @@
             <p><strong>City:</strong> <%= form.city %></p>
             <p><strong>Gender:</strong> <%= form.gender %></p>
             <p><em><%= form.bio %></em></p>
-            <%const inviteSent = invites.some(invite => (invite.sender_id === userId) || (invite.receiver_id === userId)); %>
+            <%const inviteSent = invites.some(invite => ((invite.sender_id === userId && invite.receiver_id === form.user_id) || (invite.sender_id === form.user_id && invite.receiver_id === userId))); %>
 
             <form class="invite-form" data-user-id="<%= form.user_id %>">
               <input type="hidden" name="to_user_id" value="<%= form.user_id %>" />
@@ -104,7 +104,7 @@
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ to_user_id: toUserId })
+          body: JSON.stringify({ receiver_id: toUserId })
         });
 
         const data = await res.json();
