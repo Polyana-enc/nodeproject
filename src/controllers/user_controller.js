@@ -1,6 +1,5 @@
 const {
   get_user_by_email,
-  get_user_password_by_id,
   delete_user_by_id,
 } = require("../repository/user_repository");
 const {
@@ -16,7 +15,7 @@ const TOKEN_MAX_AGE = 1 * 24 * 60 * 60 * 1000;
 async function get_user_by_id(req, res, next) {
   try {
     const user_id = req.user_id;
-    const user = get_user(user_id);
+    const user = await get_user(user_id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -57,7 +56,7 @@ async function user_login(req, res, next) {
       });
     }
 
-    const isMatch = await comparePasswords(password, get_user_password_by_id(user.id));
+    const isMatch = await comparePasswords(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,

@@ -107,8 +107,8 @@ async function getInfoById(req, res, next) {
 
 async function getFormByUserId(req, res, next) {
   try {
-    const form_id = req.user_id;
-    const form = await get_form_by_user_id(form_id);
+    const user_id = req.user_id;
+    const form = await get_form_by_user_id(user_id);
 
     if (!form) {
       return res.status(404).json({
