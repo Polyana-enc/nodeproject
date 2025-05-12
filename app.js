@@ -37,9 +37,6 @@ app.use("/api", formsRouter);
 app.use("/api", invitesRouter);
 
 function init() {
-  deserialize_all_forms();
-  deserialize_all_users();
-  deserialize_all_invites();
 }
 init();
 app.listen(PORT, () => {

@@ -1,45 +1,18 @@
 //KURMAX CODE ඞ
-const fs = require("fs").promises;
 const DtoForm = require("../models/form_model.js");
-const MOCK_FORMS = "../nodeproject/src/mock/forms.json";
-
-let forms = [];
-/**
- * Deserializes all forms in JSON
- */
-async function deserialize_all_forms() {
-  const data = await fs.readFile(MOCK_FORMS, "utf8");
-  const array = JSON.parse(data);
-  forms = array.map((el) => {
-    return new DtoForm(
-      el.id,
-      el.user_id,
-      el.name,
-      el.age,
-      el.gender,
-      el.city,
-      el.bio,
-      el.email,
-      el.phone,
-    );
-  });
-}
-/**
- * Serializes all forms in JSON
- */
-async function serialize_all_forms() {
-  await fs.writeFile(MOCK_FORMS, JSON.stringify(forms, null, 2), "utf8");
-}
+const pool = require("../../db.js").default;
 /**
  * Creates new form by data
  * @param {object} data {user_id, name, age, gender, city, bio, email, phone,}
  * @returns {DtoForm} created form
  */
 async function create_form(data) {
-  const newId = forms.length > 0 ? Math.max(...forms.map((u) => u.id)) + 1 : 1;
-  if (forms.find((el) => el.user_id === data.user_id)) return null;
-  const new_form = new DtoForm(
-    newId,
+  const query = `
+    INSERT INTO forms (user_id, name, age, gender, city, bio, email, phone)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING *;
+  `;
+  const res = await pool.query(query, [
     data.user_id,
     data.name,
     data.age,
@@ -48,45 +21,76 @@ async function create_form(data) {
     data.bio,
     data.email,
     data.phone,
-  );
-  forms.push(new_form);
-  await serialize_all_forms();
-  return new_form;
+  ]);
+  return new DtoForm(...Object.values(res.rows[0]));
 }
 /**
- * Returns all forms
- * @returns {DtoForm[]}
+ * Returns all forms from the database
+ * @returns {DtoForm[]} Array of forms
  */
-function get_all_forms() {
-  return forms;
+async function get_all_forms() {
+  const res = await pool.query("SELECT * FROM forms");
+  return res.rows.map((row) => new DtoForm(...Object.values(row)));
 }
 /**
- * Returns form by user id and undefined otherwise
+ * Returns form by user id from the database
  * @param {number} user_id form user id
- * @returns {DtoForm} found form
+ * @returns {DtoForm|null} found form or null if not found
  */
-function get_form_by_user_id(user_id) {
-  return forms.find((el) => el.user_id === user_id);
+async function get_form_by_user_id(user_id) {
+  const res = await pool.query("SELECT * FROM forms WHERE user_id = $1", [
+    user_id,
+  ]);
+  if (res.rows.length === 0) return null;
+  return new DtoForm(...Object.values(res.rows[0]));
 }
 /**
- * Returns form by id and undefined otherwise
+ * Returns form by id from the database
  * @param {number} id form id
- * @returns {DtoForm} found form
+ * @returns {DtoForm|null} found form or null if not found
  */
-function get_form_by_id(id) {
-  return forms.find((el) => el.id === Number(id));
+async function get_form_by_id(id) {
+  const res = await pool.query("SELECT * FROM forms WHERE id = $1", [id]);
+  if (res.rows.length === 0) return null;
+  return new DtoForm(...Object.values(res.rows[0]));
 }
 /**
- * Deletes form (if it exists) by its id
+ * Updates a form by id in the database
+ * @param {object} data {id, name, age, gender, city, bio, email, phone}
+ * @returns {DtoForm|null} updated form or null if not found
+ */
+async function update_form_by_id(data) {
+  const query = `
+    UPDATE forms SET
+      name = $1, age = $2, gender = $3, city = $4, bio = $5, email = $6, phone = $7
+    WHERE id = $8
+    RETURNING *;
+  `;
+  const res = await pool.query(query, [
+    data.name,
+    data.age,
+    data.gender,
+    data.city,
+    data.bio,
+    data.email,
+    data.phone,
+    data.id,
+  ]);
+  if (res.rows.length === 0) return null;
+  return new DtoForm(...Object.values(res.rows[0]));
+}
+/**
+ * Deletes a form by id from the database
  * @param {number} id form id
  */
 async function delete_form_by_id(id) {
-  const form_index = forms.findIndex((el) => el.id === Number(id));
-  if (form_index === -1) {
-    throw new Error(`Trying to delete non-existent form, id:${id}`);
+  const res = await pool.query("DELETE FROM forms WHERE id = $1 RETURNING *", [
+    id,
+  ]);
+  if (res.rows.length === 0) {
+    throw new Error(`Trying to delete non-existent form with id: ${id}`);
   }
-  forms.splice(id - 1, 1);
-  await serialize_all_forms();
+  return new DtoForm(...Object.values(res.rows[0]));
 }
 /**
  * Deletes form (if it exists) by its user id
@@ -96,28 +100,8 @@ async function delete_form_by_user_id(user_id) {
   const form = get_form_by_user_id(user_id);
   await delete_form_by_id(form.id);
 }
-/**
- * Updates form (if it exists) information by id and otherwise returns null
- * @param {object} data {id, name, age, gender, city, bio, email, phone}
- * @returns {DtoForm} updated form
- */
-function update_form_by_id(data) {
-  const form = get_form_by_id(data.id);
-  if (!form) return null;
-  form.name = data.name;
-  form.age = data.age;
-  form.gender = data.gender;
-  form.city = data.city;
-  form.bio = data.bio;
-  form.email = data.email;
-  form.phone = data.phone;
-  serialize_all_forms();
-  return form;
-}
 
 module.exports = {
-  serialize_all_forms,
-  deserialize_all_forms,
   create_form,
   get_form_by_user_id,
   get_form_by_id,

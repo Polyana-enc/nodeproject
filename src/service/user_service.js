@@ -15,7 +15,7 @@ class UserExistsError extends Error {
     }
 }
 
-function get_user(id) {
+async function get_user(id) {
   return get_user_by_id(id);
 }
 
