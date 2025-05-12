@@ -6,85 +6,6 @@
   <title>LoveConnect – Home</title>
   <link rel="stylesheet" href="/css/styles.css"/>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(120deg, #fceabb, #f8b500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      background: white;
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      max-width: 1100px;
-      width: 100%;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      color: #e63946;
-    }
-
-    .nav-buttons {
-      display: flex;
-      gap: 0.8rem;
-      margin-top: 1rem;
-    }
-
-    .btn {
-      padding: 0.5rem 1rem;
-      background-color: #e63946;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-      text-decoration: none;
-    }
-
-    .btn2 {
-      padding: 0.5rem 1rem;
-      display: flex;
-      background-color: #e63946;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-      text-decoration: none;
-      }
-
-    .btn:hover {
-      background-color: #d62839;
-    }
-
-    .btn2:hover:hover {
-      background-color: #d62839;
-    }
-
-    .btn.secondary {
-      background-color: #6c757d;
-    }
-
-    .btn.secondary:hover {
-      background-color: #495057;
-    }
-
     .search-section {
       display: flex;
       gap: 1rem;
@@ -133,8 +54,8 @@
     <header>
       <h1>Find some friends ❤️</h1>
       <div class="nav-buttons">
-        <a href="#" id="logoutBtn" class="btn2">🚪 Logout</a>
-  <a class="btn secondary" href="/user">My Page</a>
+        <a href="#" id="logoutBtn" ><button>Logout</button></a>
+  <a href="/user"><button class="secondary">My Page</button></a>
 </div>
 
     </header>
@@ -142,7 +63,7 @@
     <div class="search-section">
       <form method="GET" action="/search" style="display: flex; width: 100%;">
         <input type="text" name="keyword" placeholder="Search profiles..." required />
-        <button class="btn" type="submit">Search</button>
+        <button type="submit">Search</button>
       </form>
     </div>
     <div class="profiles">
@@ -159,7 +80,7 @@
 
             <form class="invite-form" data-user-id="<%= form.user_id %>">
               <input type="hidden" name="to_user_id" value="<%= form.user_id %>" />
-              <button class="btn" type="submit" <%= inviteSent ? "disabled" : "" %>>
+              <button type="submit" <%= inviteSent ? "disabled" : "" %>>
                 <%= inviteSent ? "✅ Invite Sent" : "📨 Send Invite" %>
               </button>
           </form>

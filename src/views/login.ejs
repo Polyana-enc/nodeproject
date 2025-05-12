@@ -1,121 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login – LoveConnect</title>
-  <link rel="stylesheet" href="/css/styles.css"/>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(120deg, #fceabb, #f8b500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      background: white;
-      padding: 2.5rem 2rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      max-width: 400px;
-      width: 100%;
-    }
-
-    h1 {
-      text-align: center;
-      color: #e63946;
-      margin-bottom: 1.5rem;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #1d3557;
-      font-weight: 600;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.6rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-
-    button {
-      width: 100%;
-      padding: 0.7rem;
-      background-color: #e63946;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background-color: #d62839;
-    }
-
-    .switch {
-      text-align: center;
-      margin-top: 1rem;
-    }
-
-    .switch a {
-      color: #1d3557;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Welcome back 💌</h1>
-    <form id="loginForm">
-      <label for="email">Email</label>
-      <input type="email" name="email" required />
-
-      <label for="password">Password</label>
-      <input type="password" name="password" required />
-
-      <button type="submit">Login</button>
-    </form>
-
-    <div class="switch">
-      Don’t have an account? <a href="/register">Register here</a>
-    </div>
-  </div>
-
-  <script>
-    const form = document.getElementById("loginForm");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = form.email.value;
-      const password = form.password.value;
-
-      const res = await fetch("/api/user/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (res.ok) {
-        window.location.href = "/";
-      } else {
-        const data = await res.json();
-        alert(data.message || "Login failed");
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login – LoveConnect</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #1d3557;
+        font-weight: 600;
       }
-    });
-  </script>
-</body>
+
+      input {
+        width: 95%;
+        padding: 0.6rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .switch {
+        text-align: center;
+        margin-top: 1rem;
+      }
+
+      .switch a {
+        color: #1d3557;
+        text-decoration: none;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container_small">
+      <h1>Welcome back 💌</h1>
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input type="email" name="email" required />
+
+        <label for="password">Password</label>
+        <input type="password" name="password" required />
+
+        <button type="submit">Login</button>
+      </form>
+
+      <div class="switch">
+        Don’t have an account? <a href="/register">Register here</a>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("loginForm");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = form.email.value;
+        const password = form.password.value;
+
+        const res = await fetch("/api/user/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (res.ok) {
+          window.location.href = "/";
+        } else {
+          const data = await res.json();
+          alert(data.message || "Login failed");
+        }
+      });
+    </script>
+  </body>
 </html>
