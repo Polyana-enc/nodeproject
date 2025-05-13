@@ -28,7 +28,9 @@
     "express": "^4.21.2",
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.15.6",
+    "pg": "^8.16.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7",
     "winston": "^3.17.0"
   },
   "devDependencies": {

@@ -13,9 +13,6 @@ const invitesRouter = require("./src/routes/invites")
 const pagesRouter = require("./src/routes/pages");
 
 const cookieParser = require("cookie-parser");
-const { deserialize_all_forms } = require("./src/repository/form_repository");
-const { deserialize_all_users } = require("./src/repository/user_repository");
-const { deserialize_all_invites } = require("./src/repository/invite_repository");
 
 app.engine(".ejs", require("ejs").__express);
 app.set("views", path.join(__dirname, "src", "views"));
@@ -36,7 +33,7 @@ app.use("/api", indexRouter);
 app.use("/api", formsRouter);
 app.use("/api", invitesRouter);
 
-function init() {
+async function init() {
 }
 init();
 app.listen(PORT, () => {

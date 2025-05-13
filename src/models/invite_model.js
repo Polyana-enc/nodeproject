@@ -1,11 +1,44 @@
-class DtoInvite {
-  constructor(id, sender_id, receiver_id, status, created_at) {
-    this.id = id;
-    this.sender_id = sender_id;
-    this.receiver_id = receiver_id;
-    this.status = status
-    this.created_at = created_at;
-  }
-}
+const { DataTypes } = require("sequelize");
+const sequelize = require("../../db.js");
+const User = require("./user_model.js");
 
-module.exports = DtoInvite
+const Invite = sequelize.define(
+  "Invite",
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    sender_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
+    receiver_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
+    status: {
+      type: DataTypes.ENUM("pending", "accepted", "rejected"),
+      allowNull: false,
+      defaultValue: "pending",
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+  },
+  {
+    tableName: "invites",
+    timestamps: false,
+  },
+);
+
+Invite.belongsTo(User, { as: "Sender", foreignKey: "sender_id" });
+Invite.belongsTo(User, { as: "Receiver", foreignKey: "receiver_id" });
+
+module.exports = Invite;

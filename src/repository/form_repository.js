@@ -1,113 +1,78 @@
 //KURMAX CODE ඞ
-const DtoForm = require("../models/form_model.js");
-const pool = require("../../db.js").default;
-const withTransaction = require("../utils/withTransaction");
+const Form = require("../models/form_model.js");
+const sequelize = require("../../db.js");
 
 /**
  * Creates new form by data
- * @param {object} data {user_id, name, age, gender, city, bio, email, phone,}
- * @returns {DtoForm} created form
+ * @param {object} data {user_id, name, age, gender, city, bio, email, phone}
+ * @returns {Promise<Form>} created form
  */
 async function create_form(data) {
-  return withTransaction(async (client) => {
-    const query = `
-    INSERT INTO forms (user_id, name, age, gender, city, bio, email, phone)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    RETURNING *;
-  `;
-    const res = await client.query(query, [
-      data.user_id,
-      data.name,
-      data.age,
-      data.gender,
-      data.city,
-      data.bio,
-      data.email,
-      data.phone,
-    ]);
-    return new DtoForm(...Object.values(res.rows[0]));
+  return await sequelize.transaction(async (t) => {
+    const form = await Form.create(data, { transaction: t });
+    return form;
   });
 }
 /**
  * Returns all forms from the database
- * @returns {DtoForm[]} Array of forms
+ * @returns {Promise<Form[]>} Array of forms
  */
 async function get_all_forms() {
-  const res = await pool.query("SELECT * FROM forms");
-  return res.rows.map((row) => new DtoForm(...Object.values(row)));
+  return await Form.findAll();
 }
 /**
  * Returns form by user id from the database
- * @param {number} user_id form user id
- * @returns {DtoForm|null} found form or null if not found
+ * @param {number} user_id
+ * @returns {Promise<Form|null>} found form or null if not found
  */
 async function get_form_by_user_id(user_id) {
-  const res = await pool.query("SELECT * FROM forms WHERE user_id = $1", [
-    user_id,
-  ]);
-  if (res.rows.length === 0) return null;
-  return new DtoForm(...Object.values(res.rows[0]));
+  return await Form.findOne({ where: { user_id } });
 }
 /**
  * Returns form by id from the database
- * @param {number} id form id
- * @returns {DtoForm|null} found form or null if not found
+ * @param {number} id
+ * @returns {Promise<Form|null>} found form or null if not found
  */
 async function get_form_by_id(id) {
-  const res = await pool.query("SELECT * FROM forms WHERE id = $1", [id]);
-  if (res.rows.length === 0) return null;
-  return new DtoForm(...Object.values(res.rows[0]));
+  return await Form.findByPk(id);
 }
 /**
  * Updates a form by id in the database
  * @param {object} data {id, name, age, gender, city, bio, email, phone}
- * @returns {DtoForm|null} updated form or null if not found
+ * @returns {Promise<Form|null>} updated form or null if not found
  */
 async function update_form_by_id(data) {
-  return withTransaction(async (client) => {
-    const query = `
-    UPDATE forms SET
-      name = $1, age = $2, gender = $3, city = $4, bio = $5, email = $6, phone = $7
-    WHERE id = $8
-    RETURNING *;
-  `;
-    const res = await client.query(query, [
-      data.name,
-      data.age,
-      data.gender,
-      data.city,
-      data.bio,
-      data.email,
-      data.phone,
-      data.id,
-    ]);
-    if (res.rows.length === 0) return null;
-    return new DtoForm(...Object.values(res.rows[0]));
+  return await sequelize.transaction(async (t) => {
+    const form = await Form.findByPk(data.id, { transaction: t });
+    if (!form) return null;
+    await form.update(data, { transaction: t });
+    return form;
   });
 }
 /**
  * Deletes a form by id from the database
- * @param {number} id form id
+ * @param {number} id
+ * @returns {Promise<Form>} deleted form
  */
 async function delete_form_by_id(id) {
-  return withTransaction(async (client) => {
-    const res = await client.query(
-      "DELETE FROM forms WHERE id = $1 RETURNING *",
-      [id],
-    );
-    if (res.rows.length === 0) {
+  return await sequelize.transaction(async (t) => {
+    const form = await Form.findByPk(id, { transaction: t });
+    if (!form) {
       throw new Error(`Trying to delete non-existent form with id: ${id}`);
     }
-    return new DtoForm(...Object.values(res.rows[0]));
+    await form.destroy({ transaction: t });
+    return form;
   });
 }
 /**
  * Deletes form (if it exists) by its user id
- * @param {number} user_id form user id
+ * @param {number} user_id
  */
 async function delete_form_by_user_id(user_id) {
-  const form = get_form_by_user_id(user_id);
-  await delete_form_by_id(form.id);
+  const form = await get_form_by_user_id(user_id);
+  if (form) {
+    await delete_form_by_id(form.id);
+  }
 }
 
 module.exports = {

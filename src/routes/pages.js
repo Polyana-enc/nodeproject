@@ -96,7 +96,7 @@ router.get("/sendedInvites", async (req, res) => {
       if (form.user_id === invite.receiver_id) {
         if (invite.status === "accepted")
           return data.push({ invite: invite, form: form });
-        else return data.push({ invite: invite, form: form.open_info() });
+        else return data.push({ invite: invite, form: form });
       }
     });
   });
