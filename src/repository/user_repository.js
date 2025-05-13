@@ -6,7 +6,7 @@ const sequelize = require("../../db.js");
 /**
  * Returns user by id and null otherwise
  * @param {number} id user id
- * @returns {object} user info except password
+ * @returns {Promise<User>} user info except password
  */
 async function get_user_by_id(id) {
   const user = await User.findByPk(id);
@@ -17,7 +17,7 @@ async function get_user_by_id(id) {
 /**
  * Returns user by email and null otherwise
  * @param {string} email user email
- * @returns {object} user info
+ * @returns {Promise<User>} user info
  */
 async function get_user_by_email(email) {
   return await User.findOne({ where: { email } });
@@ -27,7 +27,7 @@ async function get_user_by_email(email) {
  * @param {string} email user email
  * @param {string} password hashed password
  * @param {string} created_at creation date
- * @returns {DtoUser} created user
+ * @returns {User} created user
  */
 async function create_user(email, password, created_at) {
   const user = await sequelize.transaction(async (t) => {
@@ -49,7 +49,7 @@ async function create_user(email, password, created_at) {
 /**
  * Updates user (if exists) by id
  * @param {number} id user id
- * @returns {DtoUser|null} updated user
+ * @returns {User|null} updated user
  */
 async function update_user_by_id(id, data) {
   return await sequelize.transaction(async (t) => {
@@ -71,7 +71,7 @@ async function update_user_by_id(id, data) {
 /**
  * Deletes user by id
  * @param {number} id user id
- * @returns {DtoUser|null} deleted user
+ * @returns {User|null} deleted user
  */
 async function delete_user_by_id(id) {
   return await sequelize.transaction(async (t) => {
@@ -87,7 +87,7 @@ async function delete_user_by_id(id) {
 /**
  * register user with form in 1 transaction
  * @param {object} data {email, password, created_at, name, age, gender, city, bio, phone}
- * @returns {{user: DtoUser, form: DtoForm}}
+ * @returns {{user: User, form: Form}}
  */
 async function register_user_with_form(data) {
   return await sequelize.transaction(async (t) => {
