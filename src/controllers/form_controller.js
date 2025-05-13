@@ -183,28 +183,30 @@ async function updateFormById(req, res, next) {
   }
 }
 
-async function deleteFormById(req, res, next) {
-  try {
-    const result = await delete_form_by_id(req.params.form_id);
+function deleteFormById(req, res, next) {
+  const formId = Number(req.params.form_id);
 
-    if (!result) {
-      return res.status(404).json({
+  delete_form_by_id(formId, (err) => {
+    if (err) {
+      if (err.message.includes("non-existent")) {
+        return res.status(404).json({
+          success: false,
+          error: "Form not found",
+        });
+      }
+
+      logger.error("Delete form error:", err);
+      return res.status(500).json({
         success: false,
-        error: "Form not found",
+        error: "Internal server error",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: `Form with ID ${req.params.form_id} deleted successfully`,
+      message: `Form with ID ${formId} deleted successfully`,
     });
-  } catch (err) {
-    logger.error("Delete form error:", err);
-    return res.status(500).json({
-      success: false,
-      error: "Internal server error",
-    });
-  }
+  });
 }
 
 async function deleteFormByUserId(req, res, next) {

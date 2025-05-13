@@ -120,22 +120,23 @@ async function getAllInvitesByReceiverId(req, res) {
   }
 }
 
-async function deleteInviteById(req, res) {
-  try {
-    const invite_id = Number(req.params.invite_id);
-    await delete_invite_by_id(invite_id);
+function deleteInviteById(req, res) {
+  const invite_id = Number(req.params.invite_id);
 
-    res.status(200).json({
-      success: true,
-      message: "Invite deleted successfully",
+  delete_invite_by_id(invite_id)
+    .then(() => {
+      res.status(200).json({
+        success: true,
+        message: "Invite deleted successfully",
+      });
+    })
+    .catch((err) => {
+      logger.error("Delete invite error:", err);
+      res.status(500).json({
+        success: false,
+        error: "Internal server error",
+      });
     });
-  } catch (err) {
-    logger.error("Delete invite error:", err);
-    return res.status(500).json({
-      success: false,
-      error: "Internal server error",
-    });
-  }
 }
 
 async function acceptInviteById(req, res) {

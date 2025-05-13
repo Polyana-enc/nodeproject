@@ -89,18 +89,21 @@ function get_all_invites_by_receiver_id(receiver_id) {
   return invites.filter((el) => el.receiver_id === receiver_id);
 }
 /**
- * Deletes invite (if it exists) by id
+ * Deletes invite (if it exists) by id using Promise
  * @param {number} invite_id invite id
+ * @returns {Promise<void>}
  */
-async function delete_invite_by_id(invite_id) {
+function delete_invite_by_id(invite_id) {
   const invite = get_invite_by_id(invite_id);
+
   if (!invite) {
-    throw new Error(
-      `Trying to delete non-existent invite, invite_id:${invite_id}`,
+    return Promise.reject(
+      new Error(`Trying to delete non-existent invite, invite_id:${invite_id}`)
     );
   }
+
   invites.splice(invite.id - 1, 1);
-  await serialize_all_invites();
+  return serialize_all_invites();
 }
 /**
  * Deletes invite (if it exists) by sender_id
