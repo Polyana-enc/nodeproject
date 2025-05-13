@@ -1,11 +1,14 @@
 const {
   get_user_by_email,
   delete_user_by_id,
+
+  register_user_with_form,
 } = require("../repository/user_repository");
 const {
   register_user,
   get_user,
   UserExistsError,
+  register_user_trans,
 } = require("../service/user_service");
 const { generateToken } = require("../utils/jwtUtil");
 const logger = require("../utils/logger");
@@ -168,8 +171,54 @@ async function deleteUserById(req, res, next) {
   }
 }
 
+
+const user_register_trans = async (req, res, _next) => {
+  const data = req.body;
+
+  if (!data.email || !data.password) {
+    logger.warn("Registration failed: missing email or password");
+    return res.status(400).json({
+      success: false,
+      error: "Email and password are required",
+    });
+  }
+
+  try {
+    const { user, token } = await register_user_trans(data);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: TOKEN_MAX_AGE,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: {
+        user: { id: user.id, email: user.email },
+      },
+    });
+  } catch (err) {
+    logger.error("User registration failed:", err);
+
+    if (err instanceof UserExistsError) {
+      return res.status(409).json({
+        success: false,
+        error: "User already exists",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+};
+
+
 module.exports = {
   user_register,
+  user_register_trans,
   get_user_by_id,
   user_login,
   user_logout,

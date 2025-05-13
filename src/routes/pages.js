@@ -138,7 +138,7 @@ router.get("/search", async (req, res) => {
     jwt.verify(token, SECRET_KEY);
 
     const keyword = req.query.keyword?.toLowerCase() || "";
-    const allForms = get_all_forms();
+    const allForms = await get_all_forms();
 
     const filtered = allForms.filter(
       (f) =>

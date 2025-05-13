@@ -1,28 +1,32 @@
 //KURMAX CODE ඞ
 const DtoForm = require("../models/form_model.js");
 const pool = require("../../db.js").default;
+const withTransaction = require("../utils/withTransaction");
+
 /**
  * Creates new form by data
  * @param {object} data {user_id, name, age, gender, city, bio, email, phone,}
  * @returns {DtoForm} created form
  */
 async function create_form(data) {
-  const query = `
+  return withTransaction(async (client) => {
+    const query = `
     INSERT INTO forms (user_id, name, age, gender, city, bio, email, phone)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *;
   `;
-  const res = await pool.query(query, [
-    data.user_id,
-    data.name,
-    data.age,
-    data.gender,
-    data.city,
-    data.bio,
-    data.email,
-    data.phone,
-  ]);
-  return new DtoForm(...Object.values(res.rows[0]));
+    const res = await client.query(query, [
+      data.user_id,
+      data.name,
+      data.age,
+      data.gender,
+      data.city,
+      data.bio,
+      data.email,
+      data.phone,
+    ]);
+    return new DtoForm(...Object.values(res.rows[0]));
+  });
 }
 /**
  * Returns all forms from the database
@@ -60,37 +64,42 @@ async function get_form_by_id(id) {
  * @returns {DtoForm|null} updated form or null if not found
  */
 async function update_form_by_id(data) {
-  const query = `
+  return withTransaction(async (client) => {
+    const query = `
     UPDATE forms SET
       name = $1, age = $2, gender = $3, city = $4, bio = $5, email = $6, phone = $7
     WHERE id = $8
     RETURNING *;
   `;
-  const res = await pool.query(query, [
-    data.name,
-    data.age,
-    data.gender,
-    data.city,
-    data.bio,
-    data.email,
-    data.phone,
-    data.id,
-  ]);
-  if (res.rows.length === 0) return null;
-  return new DtoForm(...Object.values(res.rows[0]));
+    const res = await client.query(query, [
+      data.name,
+      data.age,
+      data.gender,
+      data.city,
+      data.bio,
+      data.email,
+      data.phone,
+      data.id,
+    ]);
+    if (res.rows.length === 0) return null;
+    return new DtoForm(...Object.values(res.rows[0]));
+  });
 }
 /**
  * Deletes a form by id from the database
  * @param {number} id form id
  */
 async function delete_form_by_id(id) {
-  const res = await pool.query("DELETE FROM forms WHERE id = $1 RETURNING *", [
-    id,
-  ]);
-  if (res.rows.length === 0) {
-    throw new Error(`Trying to delete non-existent form with id: ${id}`);
-  }
-  return new DtoForm(...Object.values(res.rows[0]));
+  return withTransaction(async (client) => {
+    const res = await client.query(
+      "DELETE FROM forms WHERE id = $1 RETURNING *",
+      [id],
+    );
+    if (res.rows.length === 0) {
+      throw new Error(`Trying to delete non-existent form with id: ${id}`);
+    }
+    return new DtoForm(...Object.values(res.rows[0]));
+  });
 }
 /**
  * Deletes form (if it exists) by its user id

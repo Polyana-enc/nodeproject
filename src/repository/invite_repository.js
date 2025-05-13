@@ -1,6 +1,7 @@
 //KURMAX CODE ඞ
 const DtoInvite = require("../models/invite_model.js");
 const pool = require("../../db").default;
+const withTransaction = require("../utils/withTransaction");
 
 /**
  * Creates a new invite
@@ -11,23 +12,24 @@ async function create_invite(data) {
   if (data.sender_id === data.receiver_id) {
     throw new Error(`Invalid receiver_id: ${data.receiver_id}`);
   }
+  return withTransaction(async (client) => {
+    const existing = await client.query(
+      "SELECT * FROM invites WHERE sender_id = $1 AND receiver_id = $2",
+      [data.sender_id, data.receiver_id],
+    );
+    if (existing.rows.length > 0) {
+      throw new Error("Invite to this user already sent");
+    }
 
-  const existing = await pool.query(
-    "SELECT * FROM invites WHERE sender_id = $1 AND receiver_id = $2",
-    [data.sender_id, data.receiver_id],
-  );
-  if (existing.rows.length > 0) {
-    throw new Error("Invite to this user already sent");
-  }
-
-  const res = await pool.query(
-    `INSERT INTO invites (sender_id, receiver_id, status, created_at)
+    const res = await client.query(
+      `INSERT INTO invites (sender_id, receiver_id, status, created_at)
      VALUES ($1, $2, 'pending', $3)
      RETURNING *`,
-    [data.sender_id, data.receiver_id, data.created_at],
-  );
+      [data.sender_id, data.receiver_id, data.created_at],
+    );
 
-  return new DtoInvite(...Object.values(res.rows[0]));
+    return new DtoInvite(...Object.values(res.rows[0]));
+  });
 }
 /**
  * Returns invite by id and null otherwise
@@ -69,14 +71,15 @@ async function get_all_invites_by_receiver_id(receiver_id) {
  * @param {'accepted' | 'rejected'} status invite status
  */
 async function set_invite_status_by_id(id, status) {
-  const res = await pool.query(
+   return withTransaction(async (client) => {
+  const res = await client.query(
     "UPDATE invites SET status = $1 WHERE id = $2 RETURNING *",
     [status, id],
   );
   if (res.rows.length === 0) {
     throw new Error(`Invite with id=${id} does not exist`);
   }
-  return new DtoInvite(...Object.values(res.rows[0]));
+  return new DtoInvite(...Object.values(res.rows[0]));})
 }
 /**
  * Deletes invite (if it exists) by id
@@ -84,14 +87,15 @@ async function set_invite_status_by_id(id, status) {
  * @returns {DtoInvite}
  */
 async function delete_invite_by_id(invite_id) {
-  const res = await pool.query(
+   return withTransaction(async (client) => {
+  const res = await client.query(
     "DELETE FROM invites WHERE id = $1 RETURNING *",
     [id],
   );
   if (res.rows.length === 0) {
     throw new Error(`Invite with id=${id} does not exist`);
   }
-  return new DtoInvite(...Object.values(res.rows[0]));
+  return new DtoInvite(...Object.values(res.rows[0]));})
 }
 
 module.exports = {
