@@ -26,11 +26,11 @@ async function register_user(data) {
   if (existing) {
         throw new UserExistsError(`User with email ${data.email} already exists`);
     }
-
+console.log(data)
   const created_date = new Date();
   const formatted_date = created_date.toISOString();
   const hash = await hashPassword(data.password);
-  const user1 = await create_user(data.email, hash, formatted_date); 
+  const user = await create_user(data.email, hash, formatted_date); 
   const token = generateToken(user.id);
 
   return { user: user, token };

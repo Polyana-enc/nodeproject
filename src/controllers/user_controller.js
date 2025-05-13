@@ -14,7 +14,7 @@ const { generateToken } = require("../utils/jwtUtil");
 const logger = require("../utils/logger");
 const { comparePasswords } = require("../utils/password");
 
-const TOKEN_MAX_AGE = 1 * 24 * 60 * 60 * 1000; 
+const TOKEN_MAX_AGE = 1 * 24 * 60 * 60 * 1000;
 async function get_user_by_id(req, res, next) {
   try {
     const user_id = req.user_id;
@@ -115,8 +115,10 @@ const user_register = async (req, res, _next) => {
   }
 
   try {
-    const { user, token } = await register_user(email, password);
-
+    const { user, token } = await register_user({
+      email: email,
+      password: password,
+    });
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: TOKEN_MAX_AGE,
@@ -171,7 +173,6 @@ async function deleteUserById(req, res, next) {
   }
 }
 
-
 const user_register_trans = async (req, res, _next) => {
   const data = req.body;
 
@@ -214,7 +215,6 @@ const user_register_trans = async (req, res, _next) => {
     });
   }
 };
-
 
 module.exports = {
   user_register,
