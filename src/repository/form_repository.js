@@ -77,24 +77,41 @@ function get_form_by_id(id) {
   return forms.find((el) => el.id === Number(id));
 }
 /**
- * Deletes form (if it exists) by its id
+ * Deletes form (if it exists) by its id using callback
  * @param {number} id form id
+ * @param {(err: Error|null) => void} callback callback function
  */
-async function delete_form_by_id(id) {
+function delete_form_by_id(id, callback) {
   const form_index = forms.findIndex((el) => el.id === Number(id));
+
   if (form_index === -1) {
-    throw new Error(`Trying to delete non-existent form, id:${id}`);
+    return callback(new Error(`Trying to delete non-existent form, id:${id}`));
   }
-  forms.splice(id - 1, 1);
-  await serialize_all_forms();
+
+  forms.splice(form_index, 1); 
+
+  serialize_all_forms()
+    .then(() => callback(null))
+    .catch((err) => callback(err));
 }
 /**
- * Deletes form (if it exists) by its user id
+ * Deletes form (if it exists) by its user id using async/await
+ * while calling callback-based delete_form_by_id
  * @param {number} user_id form user id
  */
 async function delete_form_by_user_id(user_id) {
   const form = get_form_by_user_id(user_id);
-  await delete_form_by_id(form.id);
+
+  if (!form) {
+    throw new Error(`Form not found for user_id: ${user_id}`);
+  }
+
+  await new Promise((resolve, reject) => {
+    delete_form_by_id(form.id, (err) => {
+      if (err) return reject(err);
+      resolve();
+    });
+  });
 }
 /**
  * Updates form (if it exists) information by id and otherwise returns null
