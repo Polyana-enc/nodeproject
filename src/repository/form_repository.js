@@ -21,6 +21,24 @@ async function get_all_forms() {
   return await Form.findAll();
 }
 /**
+ * Returns page of forms from the database
+ * @param {number} offset how many instances to skip
+ * @param {number} limit how may instances to pull
+ * @returns {Promise<Form[]>} Array of forms
+ */
+async function get_page_of_forms(offset, limit) {
+  return await Form.findAll({ offset: offset, limit: limit });
+}
+/**
+ * Returns page of forms from the database
+ * @param {male|female} gender
+ * @returns {Promise<Form[]>} Array of forms
+ */
+async function get_filtered_by_gender_forms(gender) {
+  return await Form.findAll({ where: { gender } });
+}
+
+/**
  * Returns form by user id from the database
  * @param {number} user_id
  * @returns {Promise<Form|null>} found form or null if not found
@@ -83,4 +101,6 @@ module.exports = {
   delete_form_by_user_id,
   update_form_by_id,
   get_all_forms,
+  get_page_of_forms,
+  get_filtered_by_gender_forms,
 };

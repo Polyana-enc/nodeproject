@@ -6,6 +6,8 @@ const {
   delete_form_by_id,
   delete_form_by_user_id,
   get_form_by_id,
+  get_page_of_forms,
+  get_filtered_by_gender_forms,
 } = require("../repository/form_repository");
 const { get_user_by_id } = require("../repository/user_repository");
 const service = require("../service/form_service");
@@ -72,6 +74,60 @@ async function getFormById(req, res, next) {
     });
   } catch (err) {
     logger.error("Get form error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+}
+
+async function getPageOfForms(req, res, next) {
+  try {
+    const offset = Number(req.params.offset);
+    const limit = Number(req.params.limit);
+    const page = await get_page_of_forms(offset, limit);
+
+    if (!page) {
+      return res.status(404).json({
+        success: false,
+        error: "Page not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { page },
+      message: "Page retrieved successfully",
+    });
+  } catch (err) {
+    logger.error("Get page error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+}
+
+async function getFilteredByGenderForms(req, res, next) {
+  try {
+    const gender = req.params.gender;
+    console.log(gender)
+    const forms = await get_filtered_by_gender_forms(gender);
+
+    if (!forms) {
+      return res.status(404).json({
+        success: false,
+        error: "Page not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { forms },
+      message: "Page retrieved successfully",
+    });
+  } catch (err) {
+    logger.error("Get forms error:", err);
     return res.status(500).json({
       success: false,
       error: "Internal server error",
@@ -240,4 +296,6 @@ module.exports = {
   getFormByUserId,
   getInfoById,
   getInfoByUserId,
+  getPageOfForms,
+  getFilteredByGenderForms,
 };

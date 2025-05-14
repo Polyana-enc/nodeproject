@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const {
   get_all_forms,
+  get_page_of_forms,
   get_form_by_user_id,
 } = require("../repository/form_repository");
 const {
@@ -13,7 +14,7 @@ const {
 const SECRET_KEY = process.env.SECRET_KEY || "default_secret_key";
 
 // Головна сторінка
-router.get("/", async (req, res)  => {
+router.get("/", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/login");
   const decoded = jwt.verify(token, SECRET_KEY);
@@ -21,7 +22,7 @@ router.get("/", async (req, res)  => {
   const form = await get_form_by_user_id(userId);
   if (!form) return res.redirect("/form/create");
   try {
-    const rawForms = await get_all_forms();
+    const rawForms = await get_page_of_forms(0, 6);
     const forms = rawForms.filter(function (form) {
       return form.user_id != userId;
     });
@@ -147,7 +148,7 @@ router.get("/search", async (req, res) => {
     );
     const invites = await get_all_invites_by_sender_id(userId);
     invites.push(...(await get_all_invites_by_receiver_id(userId)));
-    res.render("index", { forms: filtered , invites: invites, userId: userId});
+    res.render("index", { forms: filtered, invites: invites, userId: userId });
   } catch (err) {
     return res.redirect("/register");
   }
