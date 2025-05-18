@@ -40,7 +40,11 @@ async function createInvite(req, res) {
     }
 
     const created_date = new Date().toISOString();
-    const invite = await create_invite({ sender_id, receiver_id, created_at: created_date });
+    const invite = await create_invite({
+      sender_id,
+      receiver_id,
+      created_at: created_date,
+    });
 
     res.status(201).json({
       success: true,

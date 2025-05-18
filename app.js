@@ -7,10 +7,9 @@ const app = express();
 const PORT = 3000;
 
 const indexRouter = require("./src/routes/index");
-const indexRouter = require("./src/routes/index");
 const usersRouter = require("./src/routes/users");
 const formsRouter = require("./src/routes/forms");
-const invitesRouter = require("./src/routes/invites")
+const invitesRouter = require("./src/routes/invites");
 const pagesRouter = require("./src/routes/pages");
 
 const cookieParser = require("cookie-parser");
@@ -34,8 +33,7 @@ app.use("/api", indexRouter);
 app.use("/api", formsRouter);
 app.use("/api", invitesRouter);
 
-async function init() {
-}
+async function init() {}
 init();
 app.listen(PORT, () => {
   logger.info(`Сервер запущено на http://localhost:${PORT}`);

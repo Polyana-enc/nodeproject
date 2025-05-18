@@ -1,11 +1,9 @@
 const express = require("express");
 const authMiddleware = require("../middleware/auth.js");
 const router = express.Router();
-const authMiddleware = require("../middleware/auth.js");
 const {
   getFormById,
   createForm,
-  updateFormById,
   updateFormById,
   deleteFormById,
   deleteFormByUserId,
