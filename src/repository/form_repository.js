@@ -34,8 +34,15 @@ async function get_page_of_forms(offset, limit) {
  * @param {male|female} gender
  * @returns {Promise<Form[]>} Array of forms
  */
-async function get_filtered_by_gender_forms(gender) {
-  return await Form.findAll({ where: { gender } });
+async function get_filtered_forms(field, value) {
+  switch (field) {
+    case "gender":
+      return await Form.findAll({ where: { gender: value } });
+    case "city":
+      return await Form.findAll({ where: { city: value } });
+    case "age":
+      return await Form.findAll({ where: { age: Number(value) } });
+  }
 }
 
 /**
@@ -102,5 +109,5 @@ module.exports = {
   update_form_by_id,
   get_all_forms,
   get_page_of_forms,
-  get_filtered_by_gender_forms,
+  get_filtered_forms,
 };

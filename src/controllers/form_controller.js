@@ -7,7 +7,7 @@ const {
   delete_form_by_user_id,
   get_form_by_id,
   get_page_of_forms,
-  get_filtered_by_gender_forms,
+  get_filtered_forms,
 } = require("../repository/form_repository");
 const { get_user_by_id } = require("../repository/user_repository");
 const service = require("../service/form_service");
@@ -108,11 +108,12 @@ async function getPageOfForms(req, res, next) {
   }
 }
 
-async function getFilteredByGenderForms(req, res, next) {
+async function getFilteredForms(req, res, next) {
   try {
-    const gender = req.params.gender;
-    console.log(gender)
-    const forms = await get_filtered_by_gender_forms(gender);
+    const field = req.params.field;
+    const value = req.params.value;
+    console.log(field, value);
+    const forms = await get_filtered_forms(field, value);
 
     if (!forms) {
       return res.status(404).json({
@@ -297,5 +298,5 @@ module.exports = {
   getInfoById,
   getInfoByUserId,
   getPageOfForms,
-  getFilteredByGenderForms,
+  getFilteredForms,
 };

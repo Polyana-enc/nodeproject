@@ -11,7 +11,7 @@ const {
   getInfoById,
   getInfoByUserId,
   getPageOfForms,
-  getFilteredByGenderForms,
+  getFilteredForms,
 } = require("../controllers/form_controller.js");
 
 router.post("/form", authMiddleware, createForm);
@@ -27,13 +27,12 @@ router.get("/form/user/:user_id/:type", getInfoByUserId);
 // GET http://example.com/form/3/private
 router.get("/form/:form_id/:type", getInfoById);
 
-router.get("/form/page/:offset/:limit", getPageOfForms)
-router.get("/form/filter/gender/:gender", getFilteredByGenderForms)
+router.get("/form/page/:offset/:limit", getPageOfForms);
+router.get("/form/filter/:field/:value", getFilteredForms); // allowed fields: "gender", "city", "age"
 // DELETE http://example.com/form
 // Authorization: token.user_id.1
 router.delete("/form", authMiddleware, deleteFormByUserId);
 router.delete("/form/:form_id", deleteFormById);
 router.put("/form", updateFormById);
-
 
 module.exports = router;
