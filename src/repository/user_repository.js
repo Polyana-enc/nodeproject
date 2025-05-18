@@ -1,107 +1,131 @@
-const logger = require("../utils/logger");
-const fs = require("fs").promises;
-const DtoUser = require("../models/user_model.js");
-const MOCK_PATH = "../nodeproject/src/mock/users.json";
+const User = require("../models/user_model.js");
+const Form = require("../models/form_model.js");
+const logger = require("../utils/logger.js");
+const sequelize = require("../../db.js");
 
-let users = [];
-/**
- * Deserializes all users in JSON
- */
-async function deserialize_all_users() {
-  const data = await fs.readFile(MOCK_PATH, "utf8");
-  const array = JSON.parse(data);
-  users = array.map((el) => {
-    return new DtoUser(
-      el.id,
-      el.email,
-      el.password,
-      el.created_at,
-      el.updated_at,
-    );
-  });
-}
-/**
- * Serializes all users in JSON
- */
-async function serialize_all_users() {
-  await fs.writeFile(MOCK_PATH, JSON.stringify(users, null, 2), "utf8");
-}
-/**
- * Returns user password by id and null otherwise
- * @param {number} id user id
- * @returns {string} hashed password
- */
-function get_user_password_by_id(id) {
-  const user = users.find((el) => el.id === id);
-  if (!user) return null;
-  return user.password;
-}
 /**
  * Returns user by id and null otherwise
  * @param {number} id user id
- * @returns {object} user info except password
+ * @returns {Promise<User>} user info except password
  */
-function get_user_by_id(id) {
-  const user = users.find((el) => el.id === id);
+async function get_user_by_id(id) {
+  const user = await User.findByPk(id);
   if (!user) return null;
-  return user.public_user();
+  const { password, ...publicUser } = user.get();
+  return publicUser;
 }
 /**
  * Returns user by email and null otherwise
  * @param {string} email user email
- * @returns {object} user info except password
+ * @returns {Promise<User>} user info
  */
 async function get_user_by_email(email) {
-  const user = users.find((user) => user.email === email);
-  if (!user) return null;
-  return user.public_user();
+  return await User.findOne({ where: { email } });
 }
 /**
  * Creates new user by object
- * {email, password, created_at}
  * @param {string} email user email
  * @param {string} password hashed password
  * @param {string} created_at creation date
- * @returns {DtoUser} created user
+ * @returns {User} created user
  */
 async function create_user(email, password, created_at) {
-  const newId = users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1;
-  const user = new DtoUser(newId, email, password, created_at, created_at);
-  users.push(user);
-  await serialize_all_users();
-  logger.info("User created:", user.email);
+  const user = await sequelize.transaction(async (t) => {
+    const newUser = await User.create(
+      {
+        email,
+        password,
+        created_at,
+        updated_at: created_at,
+      },
+      { transaction: t },
+    );
+
+    logger.info("User created:", email);
+    return newUser;
+  });
   return user;
 }
 /**
- * Updates user (if it exists) by id
+ * Updates user (if exists) by id
  * @param {number} id user id
- * @returns {DtoUser} updated user
+ * @returns {User|null} updated user
  */
-function update_user_by_id(id){
-  const user = get_user_by_id(id);
-  if(!user) return null
-  user.email = data.email;
-  user.password = data.password;
-  user.updated_at = data.updated_at
-  serialize_all_users()
-  return user
+async function update_user_by_id(id, data) {
+  return await sequelize.transaction(async (t) => {
+    const user = await User.findByPk(id, { transaction: t });
+    if (!user) return null;
+
+    await user.update(
+      {
+        email: data.email,
+        password: data.password,
+        updated_at: data.updated_at,
+      },
+      { transaction: t },
+    );
+
+    return user;
+  });
+}
+/**
+ * Deletes user by id
+ * @param {number} id user id
+ * @returns {User|null} deleted user
+ */
+async function delete_user_by_id(id) {
+  return await sequelize.transaction(async (t) => {
+    const user = await User.findByPk(id, { transaction: t });
+    if (!user) return null;
+
+    await user.destroy({ transaction: t });
+    return user;
+  });
 }
 
-function delete_user_by_id(id){
-  const user = get_user_by_id(id);
-  if(!user) return null
-  users = users.filter(function(user){return user.id != id})
-  serialize_all_users()
-  return user
+//🚧🚧🚧
+/**
+ * register user with form in 1 transaction
+ * @param {object} data {email, password, created_at, name, age, gender, city, bio, phone}
+ * @returns {{user: User, form: Form}}
+ */
+async function register_user_with_form(data) {
+  return await sequelize.transaction(async (t) => {
+    const user = await User.create(
+      {
+        email: data.email,
+        password: data.password,
+        created_at: data.created_at,
+        updated_at: data.created_at,
+      },
+      { transaction: t },
+    );
+
+    await Form.create(
+      {
+        user_id: user.id,
+        name: data.name,
+        age: data.age,
+        gender: data.gender,
+        city: data.city,
+        bio: data.bio,
+        email: data.email,
+        phone: data.phone,
+      },
+      { transaction: t },
+    );
+
+    return { user };
+  });
 }
+//🚧🚧🚧
 
 module.exports = {
-  serialize_all_users,
-  deserialize_all_users,
   create_user,
   get_user_by_id,
   get_user_by_email,
-  get_user_password_by_id,
   update_user_by_id,
   delete_user_by_id,
+
+  register_user_with_form,
 };

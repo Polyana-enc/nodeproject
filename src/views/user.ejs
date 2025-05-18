@@ -4,33 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Page – LoveConnect</title>
+    <title>My Page – LoveConnect</title>
     <link rel="stylesheet" href="/css/styles.css" />
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(120deg, #fceabb, #f8b500);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-      }
-
-      .container {
-        background: white;
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        max-width: 500px;
-        width: 100%;
+      .container_small {
         text-align: center;
-      }
-
-      h1 {
-        font-size: 2rem;
-        color: #e63946;
-        margin-bottom: 1.5rem;
       }
 
       .buttons {
@@ -39,109 +17,65 @@
         gap: 1rem;
         margin-top: 1.5rem;
       }
-
-      .btn {
-        padding: 0.7rem;
-        background-color: #e63946;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background 0.3s;
-      }
-
-      .btn2 {
-        margin: auto;
-        width: 20%;
-        padding: 0.7rem;
-        background-color: #e63946;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background 0.3s;
+      button {
+        width: 100%;
       }
 
       .button-row {
         display: flex;
-        gap: 1rem;
-      }
-
-      .button-row .btn {
-        flex: 1 1 0;
-        padding: 0.7rem;
-        background-color: #e63946;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        text-align: center;
-        transition: background 0.3s;
-      }
-
-      .btn:hover {
-        background-color: #d62839;
-      }
-
-      .btn.secondary {
-        background-color: #6c757d;
-      }
-
-      .btn.secondary:hover {
-        background-color: #495057;
-      }
-
-      form {
-        margin: 0;
+        gap: 2.9rem;
+        /* flex: 1 1 0; */
+        align-items: center;
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="container_small">
       <h1>My Page</h1>
 
       <div class="buttons">
-        <a class="btn" href="/form/edit">✏️ Edit My Profile</a>
+        <a href="/form/edit"><button>✏️ Edit My Profile</button></a>
         <div class="button-row">
-          <a class="btn" href="/sendedInvites">💌 Sended Invites</a>
-          <a class="btn" href="/receivedInvites">📥 Received Invites</a>
+          <div>
+            <a href="/sendedInvites"><button style="width: 120%">💌 Sended Invites</button></a>
+          </div>
+          <div>
+            <a href="/receivedInvites"><button style="width: 120%">📥 Received Invites</button></a>
+          </div>
         </div>
 
-        <a class="btn secondary" href="/">⬅ Back to Main Page</a>
-        <a href="#" id="logoutBtn" class="btn2">🚪 Logout</a>
+        <a class="btn secondary" href="/"
+          ><button class="secondary">⬅ Back to Main Page</button></a
+        >
+        <a href="#" id="logoutBtn"
+          ><button style="width: 25%">🚪 Logout</button></a
+        >
       </div>
     </div>
   </body>
 </html>
 <script>
-  const logoutBtn = document.querySelector('#logoutBtn');
+  const logoutBtn = document.querySelector("#logoutBtn");
 
-logoutBtn.addEventListener('click', async (e) => {
-  e.preventDefault();
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
 
-  try {
-    const res = await fetch("/api/user/logout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
+    try {
+      const res = await fetch("/api/user/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
 
-    if (res.ok) {
-      window.location.href = "/";
-    } else {
-      const data = await res.json();
-      alert(data.message || "Logout error");
+      if (res.ok) {
+        window.location.href = "/";
+      } else {
+        const data = await res.json();
+        alert(data.message || "Logout error");
+      }
+    } catch (err) {
+      console.error("Logout failed:", err);
+      alert("An unexpected error occurred");
     }
-  } catch (err) {
-    console.error("Logout failed:", err);
-    alert("An unexpected error occurred");
-  }
-});
-
+  });
 </script>

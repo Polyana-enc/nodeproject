@@ -1,22 +1,24 @@
 const {
   get_user_by_email,
-  get_user_password_by_id,
   delete_user_by_id,
+
+  register_user_with_form,
 } = require("../repository/user_repository");
 const {
   register_user,
   get_user,
   UserExistsError,
+  register_user_trans,
 } = require("../service/user_service");
 const { generateToken } = require("../utils/jwtUtil");
 const logger = require("../utils/logger");
 const { comparePasswords } = require("../utils/password");
 
-const TOKEN_MAX_AGE = 1 * 24 * 60 * 60 * 1000; 
+const TOKEN_MAX_AGE = 1 * 24 * 60 * 60 * 1000;
 async function get_user_by_id(req, res, next) {
   try {
     const user_id = req.user_id;
-    const user = get_user(user_id);
+    const user = await get_user(user_id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -57,7 +59,7 @@ async function user_login(req, res, next) {
       });
     }
 
-    const isMatch = await comparePasswords(password, get_user_password_by_id(user.id));
+    const isMatch = await comparePasswords(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -113,8 +115,10 @@ const user_register = async (req, res, _next) => {
   }
 
   try {
-    const { user, token } = await register_user(email, password);
-
+    const { user, token } = await register_user({
+      email: email,
+      password: password,
+    });
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: TOKEN_MAX_AGE,
@@ -169,8 +173,52 @@ async function deleteUserById(req, res, next) {
   }
 }
 
+const user_register_trans = async (req, res, _next) => {
+  const data = req.body;
+
+  if (!data.email || !data.password) {
+    logger.warn("Registration failed: missing email or password");
+    return res.status(400).json({
+      success: false,
+      error: "Email and password are required",
+    });
+  }
+
+  try {
+    const { user, token } = await register_user_trans(data);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: TOKEN_MAX_AGE,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: {
+        user: { id: user.id, email: user.email },
+      },
+    });
+  } catch (err) {
+    logger.error("User registration failed:", err);
+
+    if (err instanceof UserExistsError) {
+      return res.status(409).json({
+        success: false,
+        error: "User already exists",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   user_register,
+  user_register_trans,
   get_user_by_id,
   user_login,
   user_logout,

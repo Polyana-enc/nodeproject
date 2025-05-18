@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const {
   get_all_forms,
+  get_page_of_forms,
   get_form_by_user_id,
 } = require("../repository/form_repository");
 const {
@@ -13,20 +14,20 @@ const {
 const SECRET_KEY = process.env.SECRET_KEY || "default_secret_key";
 
 // Головна сторінка
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/login");
   const decoded = jwt.verify(token, SECRET_KEY);
   const userId = decoded.id;
-  const form = get_form_by_user_id(userId);
+  const form = await get_form_by_user_id(userId);
   if (!form) return res.redirect("/form/create");
   try {
-    const rawForms = get_all_forms();
+    const rawForms = await get_page_of_forms(0, 6);
     const forms = rawForms.filter(function (form) {
       return form.user_id != userId;
     });
-    const invites = get_all_invites_by_sender_id(userId);
-    invites.push(get_all_invites_by_receiver_id(userId));
+    const invites = await get_all_invites_by_sender_id(userId);
+    invites.push(...(await get_all_invites_by_receiver_id(userId)));
     res.render("index", { forms, invites, userId });
   } catch (err) {
     console.log(err);
@@ -35,20 +36,24 @@ router.get("/", (req, res) => {
 });
 
 // My Page
-router.get("/user", (req, res) => {
+router.get("/user", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/login");
   const decoded = jwt.verify(token, SECRET_KEY);
   const userId = decoded.id;
-  const form = get_form_by_user_id(userId);
+  const form = await get_form_by_user_id(userId);
   if (!form) return res.redirect("/form/create");
   res.render("user");
 });
 
 // Login page
+
+// Login page
 router.get("/login", (req, res) => {
   res.render("login");
 });
+
+// Register page
 
 // Register page
 router.get("/register", (req, res) => {
@@ -63,12 +68,12 @@ router.get("/form/create", (req, res) => {
 });
 
 // Form Edit Page
-router.get("/form/edit", (req, res) => {
+router.get("/form/edit", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/login");
   const decoded = jwt.verify(token, SECRET_KEY);
   const userId = decoded.id;
-  const form = get_form_by_user_id(userId);
+  const form = await get_form_by_user_id(userId);
   if (!form) return res.redirect("/form/create");
   try {
     res.render("form_edit", { form: form });
@@ -78,15 +83,15 @@ router.get("/form/edit", (req, res) => {
   }
 });
 
-router.get("/sendedInvites", (req, res) => {
+router.get("/sendedInvites", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/login");
   const decoded = jwt.verify(token, SECRET_KEY);
   const userId = decoded.id;
-  const invites = get_all_invites_by_sender_id(userId);
-  const form = get_form_by_user_id(userId);
+  const invites = await get_all_invites_by_sender_id(userId);
+  const form = await get_form_by_user_id(userId);
   if (!form) return res.redirect("/form/create");
-  const forms = get_all_forms();
+  const forms = await get_all_forms();
   const formattedForms = forms.filter((form) =>
     invites.some((invite) => form.user_id === invite.receiver_id),
   );
@@ -96,22 +101,22 @@ router.get("/sendedInvites", (req, res) => {
       if (form.user_id === invite.receiver_id) {
         if (invite.status === "accepted")
           return data.push({ invite: invite, form: form });
-        else return data.push({ invite: invite, form: form.open_info() });
+        else return data.push({ invite: invite, form: form });
       }
     });
   });
   res.render("sendedInvites", { data });
 });
 
-router.get("/receivedInvites", (req, res) => {
+router.get("/receivedInvites", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/login");
   const decoded = jwt.verify(token, SECRET_KEY);
   const userId = decoded.id;
-  const form = get_form_by_user_id(userId);
+  const form = await get_form_by_user_id(userId);
   if (!form) return res.redirect("/form/create");
-  const invites = get_all_invites_by_receiver_id(userId);
-  const forms = get_all_forms();
+  const invites = await get_all_invites_by_receiver_id(userId);
+  const forms = await get_all_forms();
   const formattedForms = forms.filter((form) =>
     invites.some((invite) => form.user_id === invite.sender_id),
   );
@@ -127,7 +132,7 @@ router.get("/receivedInvites", (req, res) => {
   res.render("receivedInvites", { data });
 });
 
-router.get("/search", (req, res) => {
+router.get("/search", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect("/register");
   const decoded = jwt.verify(token, SECRET_KEY);
@@ -138,16 +143,16 @@ router.get("/search", (req, res) => {
     jwt.verify(token, SECRET_KEY);
 
     const keyword = req.query.keyword?.toLowerCase() || "";
-    const allForms = get_all_forms();
+    const allForms = await get_all_forms();
 
     const filtered = allForms.filter(
       (f) =>
         f.name.toLowerCase().includes(keyword) ||
         f.city.toLowerCase().includes(keyword),
     );
-    const invites = get_all_invites_by_sender_id(userId);
-    invites.push(get_all_invites_by_receiver_id(userId));
-    res.render("index", { forms: filtered , invites: invites, userId: userId});
+    const invites = await get_all_invites_by_sender_id(userId);
+    invites.push(...(await get_all_invites_by_receiver_id(userId)));
+    res.render("index", { forms: filtered, invites: invites, userId: userId });
   } catch (err) {
     return res.redirect("/register");
   }

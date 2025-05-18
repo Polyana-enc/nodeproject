@@ -3,9 +3,12 @@ const {
   create_form,
   get_form_by_user_id,
   update_form_by_id,
+  update_form_by_id,
   delete_form_by_id,
   delete_form_by_user_id,
   get_form_by_id,
+  get_page_of_forms,
+  get_filtered_forms,
 } = require("../repository/form_repository");
 const { get_user_by_id } = require("../repository/user_repository");
 const service = require("../service/form_service");
@@ -32,6 +35,18 @@ async function createForm(req, res, next) {
     }
 
     const form = await create_form({ ...data, user_id: req.user_id });
+    if (form === null) {
+      return res.status(409).json({
+        success: false,
+        error: "User already has a form",
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Form created successfully",
+      data: { form },
+    });
     if (form === null) {
       return res.status(409).json({
         success: false,
@@ -79,6 +94,60 @@ async function getFormById(req, res, next) {
   }
 }
 
+async function getPageOfForms(req, res, next) {
+  try {
+    const offset = Number(req.params.offset);
+    const limit = Number(req.params.limit);
+    const page = await get_page_of_forms(offset, limit);
+
+    if (!page) {
+      return res.status(404).json({
+        success: false,
+        error: "Page not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { page },
+      message: "Page retrieved successfully",
+    });
+  } catch (err) {
+    logger.error("Get page error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+}
+
+async function getFilteredForms(req, res, next) {
+  try {
+    const field = req.params.field;
+    const value = req.params.value;
+    const forms = await get_filtered_forms(field, value);
+
+    if (!forms) {
+      return res.status(404).json({
+        success: false,
+        error: "Page not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { forms },
+      message: "Page retrieved successfully",
+    });
+  } catch (err) {
+    logger.error("Get forms error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+}
+
 async function getInfoById(req, res, next) {
   try {
     const { form_id, type } = req.params;
@@ -107,8 +176,8 @@ async function getInfoById(req, res, next) {
 
 async function getFormByUserId(req, res, next) {
   try {
-    const form_id = req.user_id;
-    const form = await get_form_by_user_id(form_id);
+    const user_id = req.user_id;
+    const form = await get_form_by_user_id(user_id);
 
     if (!form) {
       return res.status(404).json({
@@ -135,6 +204,39 @@ async function getInfoByUserId(req, res, next) {
   try {
     const form_id = req.query.user_id;
     const form = await service.getFormByUserId(form_id, req.params.type);
+
+    if (!form) {
+      return res.status(404).json({
+        success: false,
+        error: "Form not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { form },
+      message: "Form info retrieved successfully",
+    });
+  } catch (err) {
+    logger.error("Get form info by user ID error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+}
+
+async function updateFormById(req, res, next) {
+  try {
+    const form = req.body;
+    const updatedForm = await update_form_by_id(form);
+
+    if (!updatedForm) {
+      return res.status(404).json({
+        success: false,
+        error: "Form not found",
+      });
+    }
 
     if (!form) {
       return res.status(404).json({
@@ -235,9 +337,12 @@ module.exports = {
   getFormById,
   createForm,
   updateFormById,
+  updateFormById,
   deleteFormById,
   deleteFormByUserId,
   getFormByUserId,
   getInfoById,
   getInfoByUserId,
+  getPageOfForms,
+  getFilteredForms,
 };

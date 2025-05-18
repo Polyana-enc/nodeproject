@@ -1,123 +1,106 @@
 //KURMAX CODE ඞ
-const fs = require("fs").promises;
-const DtoForm = require("../models/form_model.js");
-const MOCK_FORMS = "../nodeproject/src/mock/forms.json";
+const Form = require("../models/form_model.js");
+const sequelize = require("../../db.js");
 
-let forms = [];
 /**
- * Deserializes all forms in JSON
+ * Creates new form by data
+ * @param {object} data {user_id, name, age, gender, city, bio, email, phone}
+ * @returns {Promise<Form>} created form
  */
-async function deserialize_all_forms() {
-  const data = await fs.readFile(MOCK_FORMS, "utf8");
-  const array = JSON.parse(data);
-  forms = array.map((el) => {
-    return new DtoForm(
-      el.id,
-      el.user_id,
-      el.name,
-      el.age,
-      el.gender,
-      el.city,
-      el.bio,
-      el.email,
-      el.phone,
-    );
+async function create_form(data) {
+  return await sequelize.transaction(async (t) => {
+    const form = await Form.create(data, { transaction: t });
+    return form;
   });
 }
 /**
- * Serializes all forms in JSON
+ * Returns all forms from the database
+ * @returns {Promise<Form[]>} Array of forms
  */
-async function serialize_all_forms() {
-  await fs.writeFile(MOCK_FORMS, JSON.stringify(forms, null, 2), "utf8");
+async function get_all_forms() {
+  return await Form.findAll();
 }
 /**
- * Creates new form by data
- * @param {object} data {user_id, name, age, gender, city, bio, email, phone,}
- * @returns {DtoForm} created form
+ * Returns page of forms from the database
+ * @param {number} offset how many instances to skip
+ * @param {number} limit how may instances to pull
+ * @returns {Promise<Form[]>} Array of forms
  */
-async function create_form(data) {
-  const newId = forms.length > 0 ? Math.max(...forms.map((u) => u.id)) + 1 : 1;
-  if (forms.find((el) => el.user_id === data.user_id)) return null;
-  const new_form = new DtoForm(
-    newId,
-    data.user_id,
-    data.name,
-    data.age,
-    data.gender,
-    data.city,
-    data.bio,
-    data.email,
-    data.phone,
-  );
-  forms.push(new_form);
-  await serialize_all_forms();
-  return new_form;
+async function get_page_of_forms(offset, limit) {
+  return await Form.findAll({ offset: offset, limit: limit });
 }
 /**
- * Returns all forms
- * @returns {DtoForm[]}
+ * Returns page of forms from the database
+ * @param {male|female} gender
+ * @returns {Promise<Form[]>} Array of forms
  */
-function get_all_forms() {
-  return forms;
+async function get_filtered_forms(field, value) {
+  switch (field) {
+    case "gender":
+      return await Form.findAll({ where: { gender: value } });
+    case "city":
+      return await Form.findAll({ where: { city: value } });
+    case "age":
+      return await Form.findAll({ where: { age: Number(value) } });
+  }
+}
+
+/**
+ * Returns form by user id from the database
+ * @param {number} user_id
+ * @returns {Promise<Form|null>} found form or null if not found
+ */
+async function get_form_by_user_id(user_id) {
+  return await Form.findOne({ where: { user_id } });
 }
 /**
- * Returns form by user id and undefined otherwise
- * @param {number} user_id form user id
- * @returns {DtoForm} found form
+ * Returns form by id from the database
+ * @param {number} id
+ * @returns {Promise<Form|null>} found form or null if not found
  */
-function get_form_by_user_id(user_id) {
-  return forms.find((el) => el.user_id === user_id);
+async function get_form_by_id(id) {
+  return await Form.findByPk(id);
 }
 /**
- * Returns form by id and undefined otherwise
- * @param {number} id form id
- * @returns {DtoForm} found form
+ * Updates a form by id in the database
+ * @param {object} data {id, name, age, gender, city, bio, email, phone}
+ * @returns {Promise<Form|null>} updated form or null if not found
  */
-function get_form_by_id(id) {
-  return forms.find((el) => el.id === Number(id));
+async function update_form_by_id(data) {
+  return await sequelize.transaction(async (t) => {
+    const form = await Form.findByPk(data.id, { transaction: t });
+    if (!form) return null;
+    await form.update(data, { transaction: t });
+    return form;
+  });
 }
 /**
- * Deletes form (if it exists) by its id
- * @param {number} id form id
+ * Deletes a form by id from the database
+ * @param {number} id
+ * @returns {Promise<Form>} deleted form
  */
 async function delete_form_by_id(id) {
-  const form_index = forms.findIndex((el) => el.id === Number(id));
-  if (form_index === -1) {
-    throw new Error(`Trying to delete non-existent form, id:${id}`);
-  }
-  forms.splice(id - 1, 1);
-  await serialize_all_forms();
+  return await sequelize.transaction(async (t) => {
+    const form = await Form.findByPk(id, { transaction: t });
+    if (!form) {
+      throw new Error(`Trying to delete non-existent form with id: ${id}`);
+    }
+    await form.destroy({ transaction: t });
+    return form;
+  });
 }
 /**
  * Deletes form (if it exists) by its user id
- * @param {number} user_id form user id
+ * @param {number} user_id
  */
 async function delete_form_by_user_id(user_id) {
-  const form = get_form_by_user_id(user_id);
-  await delete_form_by_id(form.id);
-}
-/**
- * Updates form (if it exists) information by id and otherwise returns null
- * @param {object} data {id, name, age, gender, city, bio, email, phone}
- * @returns {DtoForm} updated form
- */
-function update_form_by_id(data) {
-  const form = get_form_by_id(data.id);
-  if (!form) return null;
-  form.name = data.name;
-  form.age = data.age;
-  form.gender = data.gender;
-  form.city = data.city;
-  form.bio = data.bio;
-  form.email = data.email;
-  form.phone = data.phone;
-  serialize_all_forms();
-  return form;
+  const form = await get_form_by_user_id(user_id);
+  if (form) {
+    await delete_form_by_id(form.id);
+  }
 }
 
 module.exports = {
-  serialize_all_forms,
-  deserialize_all_forms,
   create_form,
   get_form_by_user_id,
   get_form_by_id,
@@ -125,4 +108,6 @@ module.exports = {
   delete_form_by_user_id,
   update_form_by_id,
   get_all_forms,
+  get_page_of_forms,
+  get_filtered_forms,
 };

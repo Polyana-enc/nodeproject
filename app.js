@@ -7,15 +7,13 @@ const app = express();
 const PORT = 3000;
 
 const indexRouter = require("./src/routes/index");
+const indexRouter = require("./src/routes/index");
 const usersRouter = require("./src/routes/users");
 const formsRouter = require("./src/routes/forms");
 const invitesRouter = require("./src/routes/invites")
 const pagesRouter = require("./src/routes/pages");
 
 const cookieParser = require("cookie-parser");
-const { deserialize_all_forms } = require("./src/repository/form_repository");
-const { deserialize_all_users } = require("./src/repository/user_repository");
-const { deserialize_all_invites } = require("./src/repository/invite_repository");
 
 app.engine(".ejs", require("ejs").__express);
 app.set("views", path.join(__dirname, "src", "views"));
@@ -36,10 +34,7 @@ app.use("/api", indexRouter);
 app.use("/api", formsRouter);
 app.use("/api", invitesRouter);
 
-function init() {
-  deserialize_all_forms();
-  deserialize_all_users();
-  deserialize_all_invites();
+async function init() {
 }
 init();
 app.listen(PORT, () => {
