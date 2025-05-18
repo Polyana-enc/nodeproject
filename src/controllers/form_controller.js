@@ -3,6 +3,7 @@ const {
   create_form,
   get_form_by_user_id,
   update_form_by_id,
+  update_form_by_id,
   delete_form_by_id,
   delete_form_by_user_id,
   get_form_by_id,
@@ -34,6 +35,18 @@ async function createForm(req, res, next) {
     }
 
     const form = await create_form({ ...data, user_id: req.user_id });
+    if (form === null) {
+      return res.status(409).json({
+        success: false,
+        error: "User already has a form",
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Form created successfully",
+      data: { form },
+    });
     if (form === null) {
       return res.status(409).json({
         success: false,
@@ -225,6 +238,39 @@ async function updateFormById(req, res, next) {
       });
     }
 
+    if (!form) {
+      return res.status(404).json({
+        success: false,
+        error: "Form not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { form },
+      message: "Form info retrieved successfully",
+    });
+  } catch (err) {
+    logger.error("Get form info by user ID error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+}
+
+async function updateFormById(req, res, next) {
+  try {
+    const form = req.body;
+    const updatedForm = await update_form_by_id(form);
+
+    if (!updatedForm) {
+      return res.status(404).json({
+        success: false,
+        error: "Form not found",
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: "Form updated successfully",
@@ -290,6 +336,7 @@ async function deleteFormByUserId(req, res, next) {
 module.exports = {
   getFormById,
   createForm,
+  updateFormById,
   updateFormById,
   deleteFormById,
   deleteFormByUserId,

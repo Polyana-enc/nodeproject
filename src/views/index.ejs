@@ -226,3 +226,58 @@
     </script>
   </body>
 </html>
+<script>
+  document.querySelectorAll(".invite-form").forEach(form => {
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault(); // prevent redirect
+
+      const toUserId = form.dataset.userId;
+      const button = form.querySelector("button");
+
+      try {
+        const res = await fetch(`/api/invite/${toUserId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ to_user_id: toUserId })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          button.textContent = "✅ Invite Sent";
+          button.disabled = true;
+        } else {
+          alert("Error: " + data.message);
+        }
+      } catch (err) {
+        console.error("Request failed:", err);
+        alert("Something went wrong.");
+      }
+    });
+  });
+  const logoutBtn = document.querySelector('#logoutBtn');
+
+logoutBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("/api/user/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      window.location.href = "/";
+    } else {
+      const data = await res.json();
+      alert(data.message || "Logout error");
+    }
+  } catch (err) {
+    console.error("Logout failed:", err);
+    alert("An unexpected error occurred");
+  }
+});
+
+</script>
