@@ -53,7 +53,7 @@
       }
     </style>
   </head>
-  <body>
+  <body data-user-id="<%= userId %>">
     <div class="container">
       <header>
         <h1>Find some friends ❤️</h1>
@@ -77,9 +77,7 @@
         <button id="filterBtn">Apply Filter</button>
       </div>
 
-      <div class="profiles" id="profilesContainer">
-        <!-- Cards will be rendered here -->
-      </div>
+      <div class="profiles" id="profilesContainer"></div>
 
       <div class="pagination">
         <button id="prevPage">Previous</button>
@@ -93,6 +91,7 @@
       const limit = 3;
       let currentPage = 1;
       let activeFilter = null;
+      const userId = document.body.dataset.userId;
 
       const profilesContainer = document.getElementById("profilesContainer");
       const pageIndicator = document.getElementById("pageIndicator");
@@ -104,22 +103,36 @@
           url = `/api/form/filter/${field}/${value}`;
         }
 
-        const res = await fetch(url);
-        const forms = await res.json();
-        if (flag) renderProfiles(forms.data.page);
-        else renderProfiles(forms.data.forms);
+        const formsRes = await fetch(url);
+        const forms = await formsRes.json();
+        const senderInvitesRes = await fetch(`/api/invite/sender/${userId}`);
+        const receiverInvitesRes = await fetch(
+          `/api/invite/receiver/${userId}`,
+        );
+        senderInvites = await senderInvitesRes.json();
+        receiverInvites = await receiverInvitesRes.json();
+        const invites = [
+          ...senderInvites.data.invites,
+          ...receiverInvites.data.invites,
+        ];
+        if (flag) renderProfiles(forms.data.page, invites);
+        else renderProfiles(forms.data.forms, invites);
       }
 
-      function renderProfiles(forms) {
+      function renderProfiles(rawForms, invites) {
         profilesContainer.innerHTML = "";
-
-        if (forms.length === 0) {
+        if (rawForms.length === 0) {
           const msg = document.createElement("p");
           msg.textContent = "No profiles found.";
           profilesContainer.appendChild(msg);
           return;
         }
+        const forms = rawForms.filter((form) => {
+          return form.user_id !== Number(userId);
+        });
 
+        console.log(forms);
+        console.log(Number(userId));
         forms.forEach((form) => {
           const card = document.createElement("div");
           card.className = "profile-card";
@@ -146,8 +159,21 @@
           hiddenInput.value = form.user_id;
 
           const inviteBtn = document.createElement("button");
-          inviteBtn.type = "submit";
-          inviteBtn.textContent = "📨 Send Invite";
+          if (
+            invites.some(
+              (invite) =>
+                (invite.sender_id === Number(userId) &&
+                  invite.receiver_id === form.user_id) ||
+                (invite.sender_id === form.user_id &&
+                  invite.receiver_id === Number(userId)),
+            )
+          ) {
+            inviteBtn.textContent = "✅ Invite Sent";
+            inviteBtn.disabled = true;
+          } else {
+            inviteBtn.type = "submit";
+            inviteBtn.textContent = "📨 Send Invite";
+          }
 
           inviteForm.appendChild(hiddenInput);
           inviteForm.appendChild(inviteBtn);
@@ -165,6 +191,7 @@
             });
 
             const data = await res.json();
+            console.log(data);
             if (res.ok) {
               inviteBtn.textContent = "✅ Invite Sent";
               inviteBtn.disabled = true;
@@ -220,17 +247,14 @@
             alert(data.message || "Logout error");
           }
         });
-
-      // Initial load
       fetchForms(true);
     </script>
   </body>
 </html>
 <script>
-  document.querySelectorAll(".invite-form").forEach(form => {
+  document.querySelectorAll(".invite-form").forEach((form) => {
     form.addEventListener("submit", async function (event) {
-      event.preventDefault(); // prevent redirect
-
+      event.preventDefault();
       const toUserId = form.dataset.userId;
       const button = form.querySelector("button");
 
@@ -238,9 +262,9 @@
         const res = await fetch(`/api/invite/${toUserId}`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ to_user_id: toUserId })
+          body: JSON.stringify({ to_user_id: toUserId }),
         });
 
         const data = await res.json();
@@ -256,28 +280,27 @@
       }
     });
   });
-  const logoutBtn = document.querySelector('#logoutBtn');
+  const logoutBtn = document.querySelector("#logoutBtn");
 
-logoutBtn.addEventListener('click', async (e) => {
-  e.preventDefault();
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
 
-  try {
-    const res = await fetch("/api/user/logout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
+    try {
+      const res = await fetch("/api/user/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
 
-    if (res.ok) {
-      window.location.href = "/";
-    } else {
-      const data = await res.json();
-      alert(data.message || "Logout error");
+      if (res.ok) {
+        window.location.href = "/";
+      } else {
+        const data = await res.json();
+        alert(data.message || "Logout error");
+      }
+    } catch (err) {
+      console.error("Logout failed:", err);
+      alert("An unexpected error occurred");
     }
-  } catch (err) {
-    console.error("Logout failed:", err);
-    alert("An unexpected error occurred");
-  }
-});
-
+  });
 </script>
