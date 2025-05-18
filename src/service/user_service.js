@@ -26,7 +26,6 @@ async function register_user(data) {
   if (existing) {
         throw new UserExistsError(`User with email ${data.email} already exists`);
     }
-console.log(data)
   const created_date = new Date();
   const formatted_date = created_date.toISOString();
   const hash = await hashPassword(data.password);

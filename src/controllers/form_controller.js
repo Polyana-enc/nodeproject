@@ -112,7 +112,6 @@ async function getFilteredForms(req, res, next) {
   try {
     const field = req.params.field;
     const value = req.params.value;
-    console.log(field, value);
     const forms = await get_filtered_forms(field, value);
 
     if (!forms) {
